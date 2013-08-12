@@ -13,7 +13,7 @@ Gem::Specification.new do |gem|
   gem.homepage      = ""
 
   ignores  = File.readlines('.gitignore').grep(/\S+/).map(&:chomp)
-  dotfiles = %w[.gitignore .travis.yml .yardopts]
+  dotfiles = %w[.gitignore .travis.yml]
 
   all_files_without_ignores = Dir['**/*'].reject { |f|
     File.directory?(f) || ignores.any? { |i| File.fnmatch(i, f) }
