@@ -1,0 +1,9 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <describeSObjectsResponse>
+      <result>
+      </result>
+    </describeSObjectsResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+

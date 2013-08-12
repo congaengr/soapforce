@@ -1,0 +1,39 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <loginResponse>
+      <result>
+        <metadataServerUrl>https://na7.salesforce.com/services/Soap/m/28.0/00DA0000000YpZ4</metadataServerUrl>
+        <passwordExpired>false</passwordExpired>
+        <sandbox>false</sandbox>
+        <serverUrl>https://na7.salesforce.com/services/Soap/u/28.0/00DA0000000YpZ4</serverUrl>
+        <sessionId>00DA0000000YpZ4!ARAAQEH.613sgjdpLDPsev9EBTxM0PMhEzbaCE505DYFCSm8tBkdDBl.NFsmPEISjp7Ccd.t9BTTFa1DRmtbxkikZPI8FqDj</sessionId>
+        <userId>005A0000003qqJRIAY</userId>
+        <userInfo>
+          <accessibilityMode>false</accessibilityMode>
+          <currencySymbol>$</currencySymbol>
+          <orgAttachmentFileSizeLimit>5242880</orgAttachmentFileSizeLimit>
+          <orgDefaultCurrencyIsoCode>USD</orgDefaultCurrencyIsoCode>
+          <orgDisallowHtmlAttachments>false</orgDisallowHtmlAttachments>
+          <orgHasPersonAccounts>false</orgHasPersonAccounts>
+          <organizationId>00DA0000000YpZ4MAK</organizationId>
+          <organizationMultiCurrency>false</organizationMultiCurrency>
+          <organizationName>TinderBox</organizationName>
+          <profileId>00eA0000000rPHTIA2</profileId>
+          <roleId xsi:nil="true"/>
+          <sessionSecondsValid>7200</sessionSecondsValid>
+          <userDefaultCurrencyIsoCode xsi:nil="true"/>
+          <userEmail>joe@gettinderbox.com</userEmail>
+          <userFullName>Joe Heth</userFullName>
+          <userId>005A0000003qqJRIAY</userId>
+          <userLanguage>en_US</userLanguage>
+          <userLocale>en_US</userLocale>
+          <userName>joe.heth@gettinderbox.com</userName>
+          <userTimeZone>America/Panama</userTimeZone>
+          <userType>Standard</userType>
+          <userUiSkin>Theme3</userUiSkin>
+        </userInfo>
+      </result>
+    </loginResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
+
