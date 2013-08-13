@@ -26,12 +26,25 @@ module Soapforce
         )
     end
 
+    # Public: Get the names of all wsdl operations.
     # List all available operations from the partner.wsdl
     def operations
       @client.operations
     end
 
+    # Public: Get the names of all wsdl operations.
+    #
     # Supports a username/password (with token) combination or session_id/server_url pair.
+    #
+    # Examples
+    #
+    #   client.login(username: 'test', password: 'password_and_token')
+    #   # => {...}
+    #
+    #   client.login(session_id: 'abcd1234', server_url: 'https://na1.salesforce.com/')
+    #   # => {...}
+    #
+    # Returns Hash of login response and user info
     def login(options={})
       result = nil
       if options[:username] && options[:password]
@@ -96,6 +109,21 @@ module Soapforce
       end
     end
 
+    # Public: Returns a detailed describe result for the specified sobject
+    #
+    # sobject - String name of the sobject.
+    #
+    # Examples
+    #
+    #   # get the describe for the Account object
+    #   client.describe('Account')
+    #   # => { ... }
+    #
+    #   # get the describe for the Account object
+    #   client.describe(['Account', 'Contact'])
+    #   # => { ... }
+    #
+    # Returns the Hash representation of the describe call.
     def describe(sobject_type)
       if sobject_type.is_a?(Array)
         list = sobject_type.map do |type|
@@ -106,7 +134,7 @@ module Soapforce
         # Cache objects to avoid repeat lookups.
         if @describe_cache[sobject_type].nil?
           response = call_soap_api(:describe_s_object, :sObjectType => sobject_type)
-          @describe_cache[sobject_type] = true
+          @describe_cache[sobject_type] = response
         else
           response = @describe_cache[sobject_type]
         end
@@ -162,7 +190,29 @@ module Soapforce
     #
     # Returns Hash of sobject record.
     def find(sobject, id, field=nil)
-      #
+      if field.nil? || field.downcase == "id"
+        retrieve(sobject, id)
+      else
+        find_by_field(sobject, id, field)
+      end
+    end
+
+    def find_by_field(sobject, id, field_name)
+      description = describe(sobject)
+      field_details = field_details(sobject, field_name)
+      field_names = field_list(sobject).join(", ")
+
+      if ["int", "currency", "double", "boolean", "percent"].include?(field_details[:type])
+        search_value = id
+      else
+        # default to quoted value
+        search_value = "'#{id}'"
+      end
+
+      soql = "Select #{field_names} From #{sobject} Where #{field_name} = #{search_value}"
+      result = query(soql)
+      # Return first query result.
+      result ? result.first : nil
     end
 
     # Public: Finds a single record and returns all fields.
@@ -174,9 +224,18 @@ module Soapforce
     # Returns Hash of sobject record.
     def retrieve(sobject, id)
       ids = id.is_a?(Array) ? id : [id]
+      call_soap_api(:retrieve, {fieldList: field_list(sobject).join(","), sObjectType: sobject, ids: ids})
+    end
+
+    def field_list(sobject)
       description = describe(sobject)
       field_list = description[:fields].collect {|c| c[:name] }
-      call_soap_api(:retrieve, {fieldList: field_list.join(","), sObjectType: sobject, ids: ids})
+    end
+
+    def field_details(sobject, field_name)
+      description = describe(sobject)
+      fields = description[:fields]
+      fields.find {|f| field_name.downcase == f[:name].downcase }
     end
 
     # Supports the following No Argument methods:

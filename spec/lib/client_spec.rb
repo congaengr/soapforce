@@ -95,6 +95,43 @@ describe Soapforce::Client do
     end
   end
 
+  describe "#find" do
+    it "should retrieve object by id" do
+
+      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+
+      body = "<tns:retrieve><tns:fieldList>Id,Name,Description,StageName</tns:fieldList><tns:sObjectType>Opportunity</tns:sObjectType><tns:ids>006A000000LbkT5IAJ</tns:ids></tns:retrieve>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
+
+      subject.find("Opportunity", "006A000000LbkT5IAJ")
+    end
+
+    it "should retrieve object by string field" do
+      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).exactly(3).with("Opportunity").and_return(fields)
+
+      body = "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where StageName = 'Prospecting'</tns:queryString></tns:query>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+
+      subject.find_by_field("Opportunity", "Prospecting", "StageName")
+    end
+
+    it "should retrieve object by number field" do
+      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "Amount", :type => "double"}]}
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).exactly(3).with("Opportunity").and_return(fields)
+
+      body = "<tns:query><tns:queryString>Select Id, Name, Description, Amount From Opportunity Where Amount = 0.0</tns:queryString></tns:query>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+
+      subject.find_by_field("Opportunity", 0.0, "Amount")
+    end
+
+  end
+
   describe "query methods" do
     it "#query" do
 
