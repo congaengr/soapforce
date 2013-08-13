@@ -197,8 +197,49 @@ module Soapforce
       end
     end
 
+    # Public: Finds record based on where condition and returns all fields.
+    #
+    # sobject - The String name of the sobject.
+    # where   - String where clause or Hash made up of field => value pairs.
+    # select  - Optional array of field names to return.
+    #
+    # Returns Hash of sobject record.
+    def find_where(sobject, where={}, select_fields=[])
+
+      if where.is_a?(String)
+        where_clause = where
+      elsif where.is_a?(Hash)
+        conditions = []
+        where.each {|k,v|
+          # Wrap strings in single quotes.
+          v = v.is_a?(String) ? "'#{v}'" : v
+          v = 'NULL' if v.nil?
+          conditions << "#{k} = #{v}"
+        }
+        where_clause = conditions.join(" AND ")
+
+      end
+
+      # Get list of fields if none were specified.
+      if select_fields.empty?
+        field_names = field_list(sobject)
+      else
+        field_names = select_fields
+      end
+
+      soql = "Select #{field_names.join(", ")} From #{sobject} Where #{where_clause}"
+      result = query(soql)
+    end
+
+    # Public: Finds a single record and returns all fields.
+    #
+    # sobject - The String name of the sobject.
+    # id      - The id of the record. If field is specified, id should be the id
+    #           of the external field.
+    # field   - External ID field to use.
+    #
+    # Returns Hash of sobject record.
     def find_by_field(sobject, id, field_name)
-      description = describe(sobject)
       field_details = field_details(sobject, field_name)
       field_names = field_list(sobject).join(", ")
 

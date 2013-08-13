@@ -108,10 +108,14 @@ describe Soapforce::Client do
       subject.find("Opportunity", "006A000000LbkT5IAJ")
     end
 
+  end
+
+  describe "#find_by_field" do
+
     it "should retrieve object by string field" do
       fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).exactly(3).with("Opportunity").and_return(fields)
+      subject.should_receive(:describe).exactly(2).with("Opportunity").and_return(fields)
 
       body = "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where StageName = 'Prospecting'</tns:queryString></tns:query>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
@@ -122,12 +126,43 @@ describe Soapforce::Client do
     it "should retrieve object by number field" do
       fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "Amount", :type => "double"}]}
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).exactly(3).with("Opportunity").and_return(fields)
+      subject.should_receive(:describe).exactly(2).with("Opportunity").and_return(fields)
 
       body = "<tns:query><tns:queryString>Select Id, Name, Description, Amount From Opportunity Where Amount = 0.0</tns:queryString></tns:query>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
 
       subject.find_by_field("Opportunity", 0.0, "Amount")
+    end
+
+  end
+
+  describe "#find_where" do
+
+    let(:fields) { {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]} }
+    let(:body) { "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where Id = '006A000000LbkT5IAJ' AND Amount = 0.0</tns:queryString></tns:query>" }
+
+    before(:each) do
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+    end
+
+    it "should retrieve records from hash conditions" do
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+
+      subject.find_where("Opportunity", {Id: "006A000000LbkT5IAJ", Amount: 0.0})
+    end
+
+    it "should retrieve records from string condition" do
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+
+      subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0")
+    end
+
+    it "should retrieve records from string condition and specify fields" do
+      subject.should_not_receive(:describe)
+
+      subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0", ["Id", "Name", "Description", "StageName"])
     end
 
   end
