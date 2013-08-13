@@ -214,7 +214,15 @@ module Soapforce
           # Wrap strings in single quotes.
           v = v.is_a?(String) ? "'#{v}'" : v
           v = 'NULL' if v.nil?
-          conditions << "#{k} = #{v}"
+
+          # Handle IN clauses when value is an array.
+          if v.is_a?(Array)
+            # Wrap single quotes around String values.
+            values = v.map {|s| s.is_a?(String) ? "'#{s}'" : s}.join(", ")
+            conditions << "#{k} IN (#{values})"
+          else
+            conditions << "#{k} = #{v}"
+          end
         }
         where_clause = conditions.join(" AND ")
 

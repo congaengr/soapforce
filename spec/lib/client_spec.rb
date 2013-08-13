@@ -141,18 +141,26 @@ describe Soapforce::Client do
     let(:fields) { {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]} }
     let(:body) { "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where Id = '006A000000LbkT5IAJ' AND Amount = 0.0</tns:queryString></tns:query>" }
 
-    before(:each) do
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
-    end
-
     it "should retrieve records from hash conditions" do
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       # retrieve calls describe to get the list of available fields.
       subject.should_receive(:describe).with("Opportunity").and_return(fields)
 
       subject.find_where("Opportunity", {Id: "006A000000LbkT5IAJ", Amount: 0.0})
     end
 
+    it "should retrieve records from hash condition using IN clause" do
+      body = "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where Id IN ('006A000000LbkT5IAJ', '006A000000AbkTcIAQ')</tns:queryString></tns:query>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+
+      subject.find_where("Opportunity", {Id: ["006A000000LbkT5IAJ", "006A000000AbkTcIAQ"]})
+    end
+
     it "should retrieve records from string condition" do
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       # retrieve calls describe to get the list of available fields.
       subject.should_receive(:describe).with("Opportunity").and_return(fields)
 
@@ -160,6 +168,7 @@ describe Soapforce::Client do
     end
 
     it "should retrieve records from string condition and specify fields" do
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       subject.should_not_receive(:describe)
 
       subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0", ["Id", "Name", "Description", "StageName"])
