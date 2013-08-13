@@ -275,7 +275,8 @@ module Soapforce
     # Returns Hash of sobject record.
     def retrieve(sobject, id)
       ids = id.is_a?(Array) ? id : [id]
-      call_soap_api(:retrieve, {fieldList: field_list(sobject).join(","), sObjectType: sobject, ids: ids})
+      sobject = call_soap_api(:retrieve, {fieldList: field_list(sobject).join(","), sObjectType: sobject, ids: ids})
+      sobject ? SObject.new(sobject) : nil
     end
 
     def field_list(sobject)
