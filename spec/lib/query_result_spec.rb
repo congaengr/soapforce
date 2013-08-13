@@ -38,6 +38,7 @@ describe Soapforce::QueryResult do
         subject.each do |obj|
           count +=1
           obj[:id].should == count
+          obj.Id.should == count
         end
         expect(count).to be(1)
       end
@@ -67,6 +68,7 @@ describe Soapforce::QueryResult do
         subject.each do |obj|
           count +=1
           obj[:id].should == count
+          obj.Id.should == count
         end
         expect(count).to be(2)
       end

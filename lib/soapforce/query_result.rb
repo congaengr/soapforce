@@ -12,6 +12,9 @@ module Soapforce
       elsif @raw_result[:records]
         @result_records = @raw_result[:records]
       end
+
+      # Convert to SObject type.
+      @result_records.map! {|hash| SObject.new(hash) }
     end
 
     # Implmentation for Enumerable mix-in.
