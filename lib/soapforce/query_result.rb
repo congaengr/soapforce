@@ -7,17 +7,24 @@ module Soapforce
     def initialize(result_hash={})
       @raw_result = result_hash
       @result_records = [] # Default for 0 size response.
-      if @raw_result[:size] == 1
+      if @raw_result[:size].to_i == 1
         @result_records = [@raw_result[:records]]
-      else
+      elsif @raw_result[:records]
         @result_records = @raw_result[:records]
       end
-
     end
 
     # Implmentation for Enumerable mix-in.
     def each(&block)
       @result_records.each(&block)
+    end
+
+    def first
+      @result_records.first
+    end
+
+    def last
+      @result_records.last
     end
 
     def size

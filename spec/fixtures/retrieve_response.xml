@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:sf="urn:sobject.partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<soapenv:Body>
+    <retrieveResponse>
+        <result xsi:type="sf:sObject">
+            <sf:type>Opportunity</sf:type>
+            <sf:Id>006A000000LbkT5IAJ</sf:Id>
+            <sf:Name>SOAPForce Opportunity</sf:Name>
+            <sf:Description xsi:nil="true"/>
+            <sf:StageName>Prospecting</sf:StageName>
+        </result>
+    </retrieveResponse>
+</soapenv:Body>
+</soapenv:Envelope>

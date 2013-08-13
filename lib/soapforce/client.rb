@@ -7,6 +7,7 @@ module Soapforce
     # The partner.wsdl is used by default but can be changed by passing in a new :wsdl option.
     # A client_id can be 
     def initialize(options={})
+      @describe_cache = {}
       @headers = {}
       @wsdl = options[:wsdl] || File.dirname(__FILE__) + "/../../resources/partner.wsdl.xml"
 
@@ -66,15 +67,52 @@ module Soapforce
       result
     end
 
+    # Public: Get the names of all sobjects on the org.
+    #
+    # Examples
+    #
+    #   # get the names of all sobjects on the org
+    #   client.list_sobjects
+    #   # => ['Account', 'Lead', ... ]
+    #
+    # Returns an Array of String names for each SObject.
+    def list_sobjects
+      response = describe_global # method_missing
+      response[:sobjects].collect { |sobject| sobject[:name] }
+    end
+
+    # Public: Get the current organization's Id.
+    #
+    # Examples
+    #
+    #   client.org_id
+    #   # => '00Dx0000000BV7z'
+    #
+    # Returns the String organization Id
+    def org_id
+      object = query('select id from Organization').first
+      if object && object[:id]
+        return object[:id].is_a?(Array) ? object[:id].first : object[:id]
+      end
+    end
+
     def describe(sobject_type)
       if sobject_type.is_a?(Array)
         list = sobject_type.map do |type|
           {:sObjectType => type} 
         end
-        call_soap_api(:describe_s_objects, :sObjectType => sobject_type)
+        response = call_soap_api(:describe_s_objects, :sObjectType => sobject_type)
       else
-        call_soap_api(:describe_s_object, :sObjectType => sobject_type)
+        # Cache objects to avoid repeat lookups.
+        if @describe_cache[sobject_type].nil?
+          response = call_soap_api(:describe_s_object, :sObjectType => sobject_type)
+          @describe_cache[sobject_type] = true
+        else
+          response = @describe_cache[sobject_type]
+        end
       end
+
+      response
     end
 
     def query(soql)
@@ -113,6 +151,32 @@ module Soapforce
     def delete(id)
       ids = id.is_a?(Array) ? id : [id]
       call_soap_api(:delete, {:ids => ids})
+    end
+
+    # Public: Finds a single record and returns all fields.
+    #
+    # sobject - The String name of the sobject.
+    # id      - The id of the record. If field is specified, id should be the id
+    #           of the external field.
+    # field   - External ID field to use (default: nil).
+    #
+    # Returns Hash of sobject record.
+    def find(sobject, id, field=nil)
+      #
+    end
+
+    # Public: Finds a single record and returns all fields.
+    #
+    # sobject - The String name of the sobject.
+    # id      - The id of the record. If field is specified, id should be the id
+    #           of the external field.
+    #
+    # Returns Hash of sobject record.
+    def retrieve(sobject, id)
+      ids = id.is_a?(Array) ? id : [id]
+      description = describe(sobject)
+      field_list = description[:fields].collect {|c| c[:name] }
+      call_soap_api(:retrieve, {fieldList: field_list.join(","), sObjectType: sobject, ids: ids})
     end
 
     # Supports the following No Argument methods:

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sf="urn:sobject.partner.soap.sforce.com">
+<soapenv:Body>
+    <queryResponse>
+        <result xsi:type="QueryResult">
+            <done>true</done>
+            <queryLocator xsi:nil="true"/>
+            <records xsi:type="sf:sObject">
+                <sf:type>Organization</sf:type>
+                <sf:Id>00DA0000000YpZ4MAK</sf:Id>
+                <sf:Id>00DA0000000YpZ4MAK</sf:Id>
+            </records>
+            <size>1</size>
+        </result>
+    </queryResponse>
+</soapenv:Body>
+</soapenv:Envelope>

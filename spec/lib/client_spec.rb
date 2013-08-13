@@ -39,6 +39,26 @@ describe Soapforce::Client do
     end
   end
 
+  describe "list_sobjects" do
+    it "should return array of object names" do
+
+      body = "<tns:describeGlobal></tns:describeGlobal>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_global_response'})
+
+      subject.list_sobjects.should == ['Account', 'AccountContactRole']
+    end
+  end
+
+  describe "org_id" do
+    it "should return organization id" do
+
+      body = "<tns:query><tns:queryString>select id from Organization</tns:queryString></tns:query>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'org_id_response'})
+
+      subject.org_id.should == "00DA0000000YpZ4MAK"
+    end
+  end
+
   describe "#descibeSObject" do
 
     it "supports single sobject name" do
@@ -46,6 +66,9 @@ describe Soapforce::Client do
       body = "<tns:describeSObject><tns:sObjectType>Opportunity</tns:sObjectType></tns:describeSObject>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_s_object_response'})
 
+      subject.describe("Opportunity")
+
+      # Hit cache.
       subject.describe("Opportunity")
     end
 
@@ -58,6 +81,19 @@ describe Soapforce::Client do
     end
   end
 
+  describe "#retrieve" do
+
+    it "should retrieve object by id" do
+      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
+      # retrieve calls describe to get the list of available fields.
+      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+
+      body = "<tns:retrieve><tns:fieldList>Id,Name,Description,StageName</tns:fieldList><tns:sObjectType>Opportunity</tns:sObjectType><tns:ids>006A000000LbkT5IAJ</tns:ids></tns:retrieve>"
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
+
+      subject.retrieve("Opportunity", "006A000000LbkT5IAJ")
+    end
+  end
 
   describe "query methods" do
     it "#query" do
@@ -106,7 +142,7 @@ describe Soapforce::Client do
       body = "<tns:create><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects></tns:create>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'create_response'})
       
-      params = { Name: "SOAPForce Opportunity", CloseDate: Date.today, StageName: 'Prospecting' }
+      params = { Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' }
       subject.create("Opportunity", params)
     end
   end
@@ -117,7 +153,7 @@ describe Soapforce::Client do
       body = "<tns:update><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:update>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'update_response'})
 
-      params = { Id: '003ABCDE', Name: "SOAPForce Opportunity", CloseDate: Date.today, StageName: 'Closed Won' }
+      params = { Id: '003ABCDE', Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
       subject.update("Opportunity", params)
     end
   end
@@ -129,8 +165,8 @@ describe Soapforce::Client do
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'upsert_response'})
 
       objects = [
-        { Name: "New Opportunity", CloseDate: Date.today, StageName: 'Prospecting' },
-        { Id: '003ABCDE', Name: "Existing Opportunity", CloseDate: Date.today, StageName: 'Closed Won' }
+        { Name: "New Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' },
+        { Id: '003ABCDE', Name: "Existing Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
       ]
       subject.upsert("External_Id__c", "Opportunity", objects)
     end

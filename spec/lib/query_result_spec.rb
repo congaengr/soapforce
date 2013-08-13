@@ -8,6 +8,8 @@ describe Soapforce::QueryResult do
     context "should have defaults" do
       it { subject.size.should == 0 }
       it { subject.query_locator.should be_nil }
+      it { subject.first.should be_nil }
+      it { subject.last.should be_nil }
       it { subject.should be_done }
     end
     

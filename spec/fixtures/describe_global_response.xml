@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<soapenv:Body>
+    <describeGlobalResponse>
+        <result>
+            <encoding>UTF-8</encoding>
+            <maxBatchSize>200</maxBatchSize>
+            <sobjects>
+                <activateable>false</activateable>
+                <createable>true</createable>
+                <custom>false</custom>
+                <customSetting>false</customSetting>
+                <deletable>true</deletable>
+                <deprecatedAndHidden>false</deprecatedAndHidden>
+                <feedEnabled>true</feedEnabled>
+                <keyPrefix>001</keyPrefix>
+                <label>Account</label>
+                <labelPlural>Accounts</labelPlural>
+                <layoutable>true</layoutable>
+                <mergeable>true</mergeable>
+                <name>Account</name>
+                <queryable>true</queryable>
+                <replicateable>true</replicateable>
+                <retrieveable>true</retrieveable>
+                <searchable>true</searchable>
+                <triggerable>true</triggerable>
+                <undeletable>true</undeletable>
+                <updateable>true</updateable>
+            </sobjects>
+            <sobjects>
+                <activateable>false</activateable>
+                <createable>true</createable>
+                <custom>false</custom>
+                <customSetting>false</customSetting>
+                <deletable>true</deletable>
+                <deprecatedAndHidden>false</deprecatedAndHidden>
+                <feedEnabled>false</feedEnabled>
+                <keyPrefix>02Z</keyPrefix>
+                <label>Account Contact Role</label>
+                <labelPlural>Account Contact Role</labelPlural>
+                <layoutable>false</layoutable>
+                <mergeable>false</mergeable>
+                <name>AccountContactRole</name>
+                <queryable>true</queryable>
+                <replicateable>true</replicateable>
+                <retrieveable>true</retrieveable>
+                <searchable>false</searchable>
+                <triggerable>false</triggerable>
+                <undeletable>false</undeletable>
+                <updateable>true</updateable>
+            </sobjects>
+        </result>
+    </describeGlobalResponse>
+</soapenv:Body>
+</soapenv:Envelope>
