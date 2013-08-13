@@ -79,6 +79,8 @@ module Soapforce
 
       result
     end
+    alias_method :authenticate, :login
+
 
     # Public: Get the names of all sobjects on the org.
     #
