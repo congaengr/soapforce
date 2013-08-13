@@ -19,14 +19,6 @@ module Soapforce
       @result_records.each(&block)
     end
 
-    def first
-      @result_records.first
-    end
-
-    def last
-      @result_records.last
-    end
-
     def size
       @raw_result[:size] || 0
     end
@@ -37,6 +29,10 @@ module Soapforce
 
     def query_locator
       @raw_result[:query_locator]
+    end
+
+    def method_missing(method, *args, &block)
+      @result_records.send(method, *args, &block)
     end
   end
 
