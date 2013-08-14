@@ -43,7 +43,6 @@ EOF
 
     def soap_headers(params={})
       return '' if params.nil? || params.empty?
-      ap params
       headers = "<env:Header>"
       headers << "<tns:CallOptions><tns:client>#{params[:client_id]}</tns:client></tns:CallOptions>" if params[:client_id]
       headers << "<tns:SessionHeader><tns:sessionId>#{params[:session_id]}</tns:sessionId></tns:SessionHeader>" if params[:session_id]
