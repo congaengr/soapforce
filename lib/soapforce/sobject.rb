@@ -28,7 +28,14 @@ module Soapforce
       end
 
       index = string_method.downcase.to_sym
-      return raw_hash.has_key?(index) ? raw_hash[index] : nil
+      # First return local hash entry.
+      return raw_hash[index] if raw_hash.has_key?(index)
+      # Then delegate to hash object.
+      if raw_hash.respond_to?(method)
+        return raw_hash.send(method, *args)
+      end
+      # Finally return nil.
+      nil
     end
 
     protected

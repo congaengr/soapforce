@@ -25,6 +25,20 @@ describe Soapforce::SObject do
         subject.Nothing.should == "New Value"
       end
     end
+
+    context "respond to hash methods" do
+
+      it "should has_key?" do
+        subject.has_key?(:name).should be_true
+        subject.has_key?(:stage_name).should be_true
+        subject.has_key?(:nothing).should be_false
+      end
+
+      it "should return keys" do
+        subject.keys.should == [:id, :name, :stage_name]
+      end
+    end
+
   end
 
 end
