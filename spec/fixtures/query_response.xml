@@ -9,14 +9,14 @@
                 <sf:type>Opportunity</sf:type>
                 <sf:Id>006A000000LZhwNIAT</sf:Id>
                 <sf:Id>006A000000LZhwNIAT</sf:Id>
-                <sf:Name>Joe Heth Opportunity</sf:Name>
+                <sf:Name>Opportunity 1</sf:Name>
                 <sf:StageName>Prospecting</sf:StageName>
             </records>
             <records xsi:type="sf:sObject">
                 <sf:type>Opportunity</sf:type>
                 <sf:Id>006A000000LaF4xIAF</sf:Id>
                 <sf:Id>006A000000LaF4xIAF</sf:Id>
-                <sf:Name>Boyd Test #1</sf:Name>
+                <sf:Name>Opportunity 2</sf:Name>
                 <sf:StageName>Value Proposition</sf:StageName>
             </records>
             <size>2</size>

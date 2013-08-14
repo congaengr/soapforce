@@ -11,17 +11,17 @@
             <orgHasPersonAccounts>false</orgHasPersonAccounts>
             <organizationId>00DA0000000YpZ4MAK</organizationId>
             <organizationMultiCurrency>false</organizationMultiCurrency>
-            <organizationName>TinderBox</organizationName>
-            <profileId>00eA0000000rPHTIA2</profileId>
+            <organizationName>Developer</organizationName>
+            <profileId>00eA0000000AAAAIA2</profileId>
             <roleId xsi:nil="true"/>
             <sessionSecondsValid>7200</sessionSecondsValid>
             <userDefaultCurrencyIsoCode xsi:nil="true"/>
-            <userEmail>joe@gettinderbox.com</userEmail>
-            <userFullName>Joe Heth</userFullName>
-            <userId>005A0000003qqJRIAY</userId>
+            <userEmail>johndoe@email.com</userEmail>
+            <userFullName>John Doe</userFullName>
+            <userId>005A000000AAAAY</userId>
             <userLanguage>en_US</userLanguage>
             <userLocale>en_US</userLocale>
-            <userName>joe.heth@gettinderbox.com</userName>
+            <userName>john.doe@email.com</userName>
             <userTimeZone>America/Panama</userTimeZone>
             <userType>Standard</userType>
             <userUiSkin>Theme3</userUiSkin>
