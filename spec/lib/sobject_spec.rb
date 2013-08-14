@@ -17,6 +17,14 @@ describe Soapforce::SObject do
       it { subject[:no_field].should be_nil }
     end
 
+    context "assignment" do
+      it "should assign through hash index" do
+        subject[:nothing].should be_nil
+        subject[:nothing] = "New Value"
+        subject[:nothing].should == "New Value"
+        subject.Nothing.should == "New Value"
+      end
+    end
   end
 
 end
