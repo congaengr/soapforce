@@ -306,8 +306,12 @@ module Soapforce
       response = @client.call(method.to_sym) do |locals|
         locals.message message_hash
       end
+      # Convert SOAP XML to Hash
       response = response.to_hash
-      result = response["#{method}_response".to_sym][:result]
+      # Get Response Body
+      response_body = response["#{method}_response".to_sym]
+      # Grab result section if exists.
+      result = response_body ? response_body[:result] : nil
       return result
     end
 

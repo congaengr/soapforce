@@ -30,8 +30,10 @@ describe Soapforce::Client do
         )
       stub.to_return(:status => 200, :body => fixture("get_user_info_response"))
 
-      subject.login(session_id: 'abcde12345', server_url: 'https://na15.salesforce.com')
-      
+      user_info = subject.login(session_id: 'abcde12345', server_url: 'https://na15.salesforce.com')
+
+      user_info[:user_email].should == "johndoe@email.com"
+      user_info[:user_full_name].should == "John Doe"
     end
 
     it "should raise arugment error when no parameters are passed" do
@@ -91,7 +93,14 @@ describe Soapforce::Client do
       body = "<tns:retrieve><tns:fieldList>Id,Name,Description,StageName</tns:fieldList><tns:sObjectType>Opportunity</tns:sObjectType><tns:ids>006A000000LbkT5IAJ</tns:ids></tns:retrieve>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
 
-      subject.retrieve("Opportunity", "006A000000LbkT5IAJ")
+      sobject = subject.retrieve("Opportunity", "006A000000LbkT5IAJ")
+
+      sobject.should be_a(Soapforce::SObject)
+      sobject.type.should == "Opportunity"
+      sobject.Id.should == "006A000000LbkT5IAJ"
+      sobject.Name.should == "SOAPForce Opportunity"
+      sobject.Description.should be_nil
+      sobject.StageName.should == "Prospecting"
     end
   end
 
@@ -105,7 +114,14 @@ describe Soapforce::Client do
       body = "<tns:retrieve><tns:fieldList>Id,Name,Description,StageName</tns:fieldList><tns:sObjectType>Opportunity</tns:sObjectType><tns:ids>006A000000LbkT5IAJ</tns:ids></tns:retrieve>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
 
-      subject.find("Opportunity", "006A000000LbkT5IAJ")
+      sobject = subject.find("Opportunity", "006A000000LbkT5IAJ")
+
+      sobject.should be_a(Soapforce::SObject)
+      sobject.type.should == "Opportunity"
+      sobject.Id.should == "006A000000LbkT5IAJ"
+      sobject.Name.should == "SOAPForce Opportunity"
+      sobject.Description.should be_nil
+      sobject.StageName.should == "Prospecting"
     end
 
   end
@@ -141,12 +157,19 @@ describe Soapforce::Client do
     let(:fields) { {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]} }
     let(:body) { "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where Id = '006A000000LbkT5IAJ' AND Amount = 0.0</tns:queryString></tns:query>" }
 
+    after(:each) do
+      @result.should be_a(Soapforce::QueryResult)
+      @result.size.should == 2
+      @result.first.Name == "Opportunity 1"
+      @result.last.Name == "Opportunity 2"
+    end
+
     it "should retrieve records from hash conditions" do
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       # retrieve calls describe to get the list of available fields.
       subject.should_receive(:describe).with("Opportunity").and_return(fields)
 
-      subject.find_where("Opportunity", {Id: "006A000000LbkT5IAJ", Amount: 0.0})
+      @result = subject.find_where("Opportunity", {Id: "006A000000LbkT5IAJ", Amount: 0.0})
     end
 
     it "should retrieve records from hash condition using IN clause" do
@@ -156,7 +179,7 @@ describe Soapforce::Client do
       # retrieve calls describe to get the list of available fields.
       subject.should_receive(:describe).with("Opportunity").and_return(fields)
 
-      subject.find_where("Opportunity", {Id: ["006A000000LbkT5IAJ", "006A000000AbkTcIAQ"]})
+      @result = subject.find_where("Opportunity", {Id: ["006A000000LbkT5IAJ", "006A000000AbkTcIAQ"]})
     end
 
     it "should retrieve records from string condition" do
@@ -164,41 +187,46 @@ describe Soapforce::Client do
       # retrieve calls describe to get the list of available fields.
       subject.should_receive(:describe).with("Opportunity").and_return(fields)
 
-      subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0")
+      @result = subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0")
     end
 
     it "should retrieve records from string condition and specify fields" do
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       subject.should_not_receive(:describe)
 
-      subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0", ["Id", "Name", "Description", "StageName"])
+      @result = subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0", ["Id", "Name", "Description", "StageName"])
     end
 
   end
 
   describe "query methods" do
-    it "#query" do
 
+    after(:each) do
+      @result.should be_a(Soapforce::QueryResult)
+      @result.size.should == 2
+      @result.first.Name == "Opportunity 1"
+      @result.last.Name == "Opportunity 2"
+    end
+
+    it "#query" do
       body = "<tns:query><tns:queryString>Select Id, Name, StageName from Opportunity</tns:queryString></tns:query>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
 
-      subject.query("Select Id, Name, StageName from Opportunity")
+      @result = subject.query("Select Id, Name, StageName from Opportunity")
     end
 
     it "#query_all" do
-
       body = "<tns:queryAll><tns:queryString>Select Id, Name, StageName from Opportunity</tns:queryString></tns:queryAll>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_all_response'})
 
-      subject.query_all("Select Id, Name, StageName from Opportunity")
+      @result = subject.query_all("Select Id, Name, StageName from Opportunity")
     end
 
     it "#query_more" do
-
       body = "<tns:queryMore><tns:queryLocator>some_locator_string</tns:queryLocator></tns:queryMore>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_more_response'})
 
-      subject.query_more("some_locator_string")
+      @result = subject.query_more("some_locator_string")
     end
 
   end
@@ -224,7 +252,10 @@ describe Soapforce::Client do
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'create_response'})
       
       params = { Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' }
-      subject.create("Opportunity", params)
+      response = subject.create("Opportunity", params)
+
+      response[:success].should be_true
+      response[:id].should == "006A000000LbiizIAB"
     end
   end
 
@@ -235,7 +266,10 @@ describe Soapforce::Client do
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'update_response'})
 
       params = { Id: '003ABCDE', Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
-      subject.update("Opportunity", params)
+      response = subject.update("Opportunity", params)
+
+      response[:success].should be_true
+      response[:id].should == "006A000000LbiizIAB"
     end
   end
 
@@ -257,7 +291,10 @@ describe Soapforce::Client do
     it "should delete existing objects" do
       body = "<tns:delete><tns:ids>003ABCDE</tns:ids></tns:delete>"
       stub = stub_api_request(endpoint, {with_body: body, fixture: 'delete_response'})
-      subject.delete("003ABCDE")
+      response = subject.delete("003ABCDE")
+
+      response[:success].should be_true
+      response[:id].should == "006A000000LbiizIAB"
     end
   end
 

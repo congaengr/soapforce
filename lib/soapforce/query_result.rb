@@ -23,7 +23,7 @@ module Soapforce
     end
 
     def size
-      @raw_result[:size] || 0
+      @raw_result[:size].to_i || 0
     end
 
     def done?
