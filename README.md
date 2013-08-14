@@ -23,7 +23,8 @@ And then execute:
 For ISV Partners you can specify your client_id in a configuration block which will get included in the CallOptions header of every request.  
 
     # config/initializers/soapforce.rb
-    # This is our ISV Partner Client ID that has been whitelisted for use in Professional and Group Editions.
+    # This is your ISV Partner Client ID.
+    # It needs to be whitelisted to enable SOAP requests in Professional and Group Editions.
     Soapforce.configure do |config|
       config.client_id     = "ParterName/SomeValue/"
     end
