@@ -283,7 +283,7 @@ describe Soapforce::Client do
         { Name: "New Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' },
         { Id: '003ABCDE', Name: "Existing Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
       ]
-      subject.upsert("External_Id__c", "Opportunity", objects)
+      subject.upsert("Opportunity", "External_Id__c", objects)
     end
   end
 

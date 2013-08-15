@@ -173,7 +173,7 @@ module Soapforce
       call_soap_api(:update, sobjects_hash(sobject_type, properties))
     end
 
-    def upsert(external_id_field_name, sobject_type, objects)
+    def upsert(sobject_type, external_id_field_name, objects)
       message = {externalIDFieldName: external_id_field_name}.merge(sobjects_hash(sobject_type, objects))
       call_soap_api(:upsert, message)
     end
