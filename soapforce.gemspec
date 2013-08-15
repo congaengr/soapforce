@@ -8,9 +8,9 @@ Gem::Specification.new do |gem|
   gem.version       = Soapforce::VERSION
   gem.authors       = ["Joe Heth"]
   gem.email         = ["joeheth@gmail.com"]
-  gem.description   = %q{Salesforce SOAP API based on Savon}
-  gem.summary       = %q{Wraps Savon API with helper methods and custom response types for the Salesforce SOAP API}
-  gem.homepage      = ""
+  gem.description   = %q{A ruby client for the Salesforce SOAP API based on Savon.}
+  gem.summary       = %q{Wraps Savon api with helper methods and custom types for interacting with the Salesforce SOAP API.}
+  gem.homepage      = "https://github.com/TinderBox/soapforce"
 
   ignores  = File.readlines('.gitignore').grep(/\S+/).map(&:chomp)
   dotfiles = %w[.gitignore .travis.yml]
