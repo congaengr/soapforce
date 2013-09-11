@@ -246,56 +246,137 @@ describe Soapforce::Client do
   end
 
   describe "#create" do
+    before(:each) do
+      @body = "<tns:create><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects></tns:create>"
+      @params = { Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' }
+    end
+
     it "should create new object" do
 
-      body = "<tns:create><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects></tns:create>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'create_response'})
-      
-      params = { Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' }
-      response = subject.create("Opportunity", params)
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response'})
+      response = subject.create("Opportunity", @params)
 
       response[:success].should be_true
       response[:id].should == "006A000000LbiizIAB"
+    end
+
+    it "should return false if object not created" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response_failure'})
+      response = subject.create("Opportunity", @params)
+      response.should be_false
+    end
+
+    it "creates! new object" do
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response'})
+      response = subject.create!("Opportunity", @params)
+
+      response[:success].should be_true
+      response[:id].should == "006A000000LbiizIAB"
+    end
+
+    it "raises exception when create! fails" do
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response_failure'})
+      expect {
+        response = subject.create!("Opportunity", @params)
+      }.to raise_error(Savon::Error)
+
     end
   end
 
   describe "#update" do
-    it "should update existing object" do
+    before(:each) do
+      @body = "<tns:update><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:update>"
+      @params = { Id: '003ABCDE', Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
+    end
 
-      body = "<tns:update><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:update>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'update_response'})
-
-      params = { Id: '003ABCDE', Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
-      response = subject.update("Opportunity", params)
+    it "updates existing object" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response'})
+      response = subject.update("Opportunity", @params)
 
       response[:success].should be_true
       response[:id].should == "006A000000LbiizIAB"
+    end
+
+    it "updates! existing object" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response'})
+      response = subject.update!("Opportunity", @params)
+
+      response[:success].should be_true
+      response[:id].should == "006A000000LbiizIAB"
+    end
+
+    it "returns false when update fails" do
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response_failure'})
+      response = subject.update("Opportunity", @params)
+      response.should be_false
+    end
+
+    it "raises exception when update fails" do
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response_failure'})
+      expect {
+        response = subject.update!("Opportunity", @params)
+      }.to raise_error(Savon::Error)
+
     end
   end
 
   describe "#upsert" do
-    it "should insert new and update existing objects" do
-
-      body = "<tns:upsert><tns:externalIDFieldName>External_Id__c</tns:externalIDFieldName><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>New Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>Existing Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:upsert>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'upsert_response'})
-
-      objects = [
+    before(:each) do
+      @body = "<tns:upsert><tns:externalIDFieldName>External_Id__c</tns:externalIDFieldName><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>New Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>Existing Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:upsert>"
+      @objects = [
         { Name: "New Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' },
         { Id: '003ABCDE', Name: "Existing Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
       ]
-      subject.upsert("Opportunity", "External_Id__c", objects)
     end
+
+    it "inserts new and updates existing objects" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'upsert_response'})
+      subject.upsert("Opportunity", "External_Id__c", @objects)
+    end
+
   end
 
   describe "#delete" do
-    it "should delete existing objects" do
-      body = "<tns:delete><tns:ids>003ABCDE</tns:ids></tns:delete>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'delete_response'})
-      response = subject.delete("003ABCDE")
+    before(:each) do
+      @body = "<tns:delete><tns:ids>006A000000LbiizIAB</tns:ids></tns:delete>"
+      @id = "006A000000LbiizIAB"
+    end
+
+    it "deletes existing object" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
+      response = subject.delete(@id)
 
       response[:success].should be_true
-      response[:id].should == "006A000000LbiizIAB"
+      response[:id].should == @id
     end
+
+    it "returns false if delete fails" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response_failure'})
+      response = subject.delete(@id)
+
+      response.should be_false
+    end
+
+    it "deletes existing object with a bang" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
+      response = subject.delete!(@id)
+
+      response[:success].should be_true
+      response[:id].should == @id
+    end
+
+    it "raises an exception if delete fails" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response_failure'})
+      expect {
+        subject.delete!(@id)
+      }.to raise_error(Savon::Error)
+    end
+
+
   end
 
 end

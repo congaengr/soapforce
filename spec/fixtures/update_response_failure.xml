@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<soapenv:Body>
+	<updateResponse>
+		<result>
+			<errors>
+				<message>insufficient access rights on cross-reference id</message>
+				<statusCode>INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY</statusCode>
+			</errors>
+			<id xsi:nil="true"/>
+			<success>false</success>
+		</result>
+	</updateResponse>
+</soapenv:Body>
+</soapenv:Envelope>

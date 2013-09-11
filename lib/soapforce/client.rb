@@ -165,23 +165,131 @@ module Soapforce
       call_soap_api(:search, {:searchString => sosl})
     end
 
+    # Public: Insert a new record.
+    #
+    # sobject - String name of the sobject.
+    # attrs   - Hash of attributes to set on the new record.
+    #
+    # Examples
+    #
+    #   # Add a new account
+    #   client.create('Account', Name: 'Foobar Inc.')
+    #   # => '0016000000MRatd'
+    #
+    # Returns the String Id of the newly created sobject.
+    # Returns false if something bad happens.
     def create(sobject_type, properties)
+      create!(sobject_type, properties)
+    rescue => e
+      false
+    end
+
+    # Public: Insert a new record.
+    #
+    # sobject - String name of the sobject.
+    # attrs   - Hash of attributes to set on the new record.
+    #
+    # Examples
+    #
+    #   # Add a new account
+    #   client.create('Account', Name: 'Foobar Inc.')
+    #   # => '0016000000MRatd'
+    #
+    # Returns the String Id of the newly created sobject.
+    # Raises exceptions if an error is returned from Salesforce.
+    def create!(sobject_type, properties)
       call_soap_api(:create, sobjects_hash(sobject_type, properties))
     end
 
+    # Public: Update a record.
+    #
+    # sobject - String name of the sobject.
+    # attrs   - Hash of attributes to set on the record.
+    #
+    # Examples
+    #
+    #   # Update the Account with Id '0016000000MRatd'
+    #   client.update('Account', Id: '0016000000MRatd', Name: 'Whizbang Corp')
+    #
+    # Returns Hash if the sobject was successfully updated.
+    # Returns false if there was an error.
     def update(sobject_type, properties)
+      update!(sobject_type, properties)
+    rescue => e
+      false
+    end
+
+    # Public: Update a record.
+    #
+    # sobject - String name of the sobject.
+    # attrs   - Hash of attributes to set on the record.
+    #
+    # Examples
+    #
+    #   # Update the Account with Id '0016000000MRatd'
+    #   client.update!('Account', Id: '0016000000MRatd', Name: 'Whizbang Corp')
+    #
+    # Returns Hash if the sobject was successfully updated.
+    # Raises an exception if an error is returned from Salesforce
+    def update!(sobject_type, properties)
       call_soap_api(:update, sobjects_hash(sobject_type, properties))
     end
 
+
+    # Public: Update or create a record based on an external ID
+    #
+    # sobject - The name of the sobject to created.
+    # field   - The name of the external Id field to match against.
+    # attrs   - Hash of attributes for the record.
+    #
+    # Examples
+    #
+    #   # Update the record with external ID of 12
+    #   client.upsert!('Account', 'External__c', External__c: 12, Name: 'Foobar')
+    #
+    # Returns Hash if the record was found and updated or newly created.
+    # Raises an exception if an error is returned from Salesforce.
     def upsert(sobject_type, external_id_field_name, objects)
       message = {externalIDFieldName: external_id_field_name}.merge(sobjects_hash(sobject_type, objects))
       call_soap_api(:upsert, message)
     end
 
+    # Public: Delete a record.
+    #
+    # sobject - String name of the sobject.
+    # id      - The Salesforce ID of the record.
+    #
+    # Examples
+    #
+    #   # Delete the Account with Id '0016000000MRatd'
+    #   client.delete('Account', '0016000000MRatd')
+    #
+    # Returns true if the sobject was successfully deleted.
+    # Returns false if an error is returned from Salesforce.
     def delete(id)
+      delete!(id)
+    rescue => e
+      false
+    end
+    alias_method :destroy, :delete
+
+    # Public: Delete a record.
+    #
+    # sobject - String name of the sobject.
+    # id      - The Salesforce ID of the record.
+    #
+    # Examples
+    #
+    #   # Delete the Account with Id '0016000000MRatd'
+    #   client.delete!('Account', '0016000000MRatd')
+    #
+    # Returns Hash if the sobject was successfully deleted.
+    # Raises an exception if an error is returned from Salesforce.
+    def delete!(id)
       ids = id.is_a?(Array) ? id : [id]
       call_soap_api(:delete, {:ids => ids})
     end
+    alias_method :destroy!, :delete
 
     # Public: Finds a single record and returns all fields.
     #
@@ -308,10 +416,18 @@ module Soapforce
       end
       # Convert SOAP XML to Hash
       response = response.to_hash
+
       # Get Response Body
       response_body = response["#{method}_response".to_sym]
+
       # Grab result section if exists.
       result = response_body ? response_body[:result] : nil
+
+      # Raise error when response contains errors
+      if result && result.is_a?(Hash) && result[:success] == false && result[:errors]
+        raise Savon::Error.new("#{result[:errors][:status_code]}: #{result[:errors][:message]}")
+      end
+
       return result
     end
 

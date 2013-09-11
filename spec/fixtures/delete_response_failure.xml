@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<soapenv:Body>
+	<deleteResponse>
+		<result>
+			<errors>
+				<message>bad id 006i000004DAKd</message>
+				<statusCode>MALFORMED_ID</statusCode>
+			</errors>
+			<id xsi:nil="true"/>
+			<success>false</success>
+		</result>
+	</deleteResponse>
+</soapenv:Body>
+</soapenv:Envelope>
