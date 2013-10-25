@@ -387,6 +387,44 @@ module Soapforce
       sobject ? SObject.new(sobject) : nil
     end
 
+    # ProcessSubmitRequest
+    #   request = {objectId: .., comments: ..., nextApproverIds: [...] }
+    # ProcessWorkItemRequest
+    #   request = {action: .., workitemId: .., comments: ..., nextApproverIds: [...] }
+    #
+    # Returns Hash of process status.
+    def process(request)
+
+      # approverIds is optional if Approval is configured to auto-assign the approver.
+      # Ensure approver ids is an array.
+      approver_ids = request[:approverIds] || []
+      approver_ids = approver_ids.is_a?(Array) ? approver_ids : [approver_ids]
+
+      request_type = request[:workitemId] ? "ProcessWorkitemRequest" : "ProcessSubmitRequest"
+
+      # Unfortunately had to use XML since I could not figure out
+      # how to get Savon2 to include the proper xsi:type attribute
+      # on the actions element.
+      xml = "<tns:actions xsi:type=\"tns:#{request_type}\">"
+      # Account for Submit or Workitem Request
+      if request[:objectId]
+        xml << "<tns:objectId>#{request[:objectId]}</tns:objectId>"
+      else
+        xml << "<tns:action>#{request[:action]}</tns:action>"
+        xml << "<tns:workitemId>#{request[:workitemId]}</tns:workitemId>"
+      end
+
+      xml << "<tns:comments>#{request[:comments]}</tns:comments>"
+      approver_ids.each do |aid|
+        xml <<  "<tns:nextApproverIds>#{aid}</tns:nextApproverIds>"
+      end
+      xml << "</tns:actions>"
+
+      call_soap_api(:process, xml)
+    end
+
+    # Helpers
+
     def field_list(sobject)
       description = describe(sobject)
       field_list = description[:fields].collect {|c| c[:name] }
