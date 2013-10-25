@@ -11,6 +11,7 @@ Gem::Specification.new do |gem|
   gem.description   = %q{A ruby client for the Salesforce SOAP API based on Savon.}
   gem.summary       = %q{Wraps Savon with helper methods and custom types for interacting with the Salesforce SOAP API.}
   gem.homepage      = "https://github.com/TinderBox/soapforce"
+  gem.license       = 'MIT'
 
   ignores  = File.readlines('.gitignore').grep(/\S+/).map(&:chomp)
   dotfiles = %w[.gitignore .travis.yml]
