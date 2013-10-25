@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com">
+	<soapenv:Body>
+		<processResponse>
+			<result>
+				<entityId>a00i0000007JBLJAA4</entityId>
+				<instanceId>04gi00000009u5PAAQ</instanceId>
+				<instanceStatus>Removed</instanceStatus>
+				<success>true</success>
+			</result>
+		</processResponse>
+	</soapenv:Body>
+</soapenv:Envelope>
