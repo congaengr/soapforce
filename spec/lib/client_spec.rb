@@ -376,7 +376,41 @@ describe Soapforce::Client do
       }.to raise_error(Savon::Error)
     end
 
+  end
 
+  describe "process" do
+
+    it "process submit request without approvers" do
+
+      @body = '<tns:process><tns:actions xsi:type="tns:ProcessSubmitRequest"><tns:objectId>a00i0000007JBLJAA4</tns:objectId><tns:comments>Submitting for Approval</tns:comments></tns:actions></tns:process>'
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
+      response = subject.process({objectId: "a00i0000007JBLJAA4", comments: "Submitting for Approval"})
+
+      response[:success].should be_true
+      response[:new_workitem_ids].should == "04ii000000098uLAAQ"
+    end
+
+    it "process submit request with approvers" do
+
+      @body = '<tns:process><tns:actions xsi:type="tns:ProcessSubmitRequest"><tns:objectId>a00i0000007JBLJAA4</tns:objectId><tns:comments>Submitting for Approval</tns:comments><tns:nextApproverIds>abcde12345</tns:nextApproverIds></tns:actions></tns:process>'
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
+      response = subject.process({objectId: "a00i0000007JBLJAA4", comments: "Submitting for Approval", approverIds: "abcde12345"})
+
+      response[:success].should be_true
+      response[:new_workitem_ids].should == "04ii000000098uLAAQ"
+    end
+
+    it "process workitem request" do
+      @body = '<tns:process><tns:actions xsi:type="tns:ProcessWorkitemRequest"><tns:action>Removed</tns:action><tns:workitemId>a00i0000007JBLJAA4</tns:workitemId><tns:comments>Recalling Request</tns:comments></tns:actions></tns:process>'
+
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'process_workitem_request_response'})
+      response = subject.process({action: "Removed", workitemId: "a00i0000007JBLJAA4", comments: "Recalling Request"})
+
+      response[:success].should be_true
+      response[:instance_status].should == "Removed"
+    end
   end
 
 end
