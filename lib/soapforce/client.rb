@@ -10,6 +10,7 @@ module Soapforce
       @describe_cache = {}
       @headers = {}
       @wsdl = options[:wsdl] || File.dirname(__FILE__) + "/../../resources/partner.wsdl.xml"
+      @logger = options[:logger] || Rails.logger
 
       # If a client_id is provided then it needs to be included 
       # in the header for every request.  This allows ISV Partners
@@ -22,8 +23,9 @@ module Soapforce
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
-        pretty_print_xml: true
-        )
+        pretty_print_xml: true,
+        logger: @logger
+      )
     end
 
     # Public: Get the names of all wsdl operations.
@@ -70,7 +72,9 @@ module Soapforce
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
-        endpoint: @server_url
+        endpoint: @server_url,
+        pretty_print_xml: true,
+        logger: @logger
       )
 
       # If a session_id/server_url were passed in then invoke get_user_info for confirmation.
