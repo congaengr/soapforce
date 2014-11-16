@@ -45,6 +45,14 @@ You can connect to sandbox orgs by specifying a host. The default host is 'login
 client = Soapforce::Client.new(:host => 'test.salesforce.com')
 ```
 
+### Logging
+
+You can specify a logger by passing a logger. Logging is disabled by default.
+
+```ruby
+client = Soapforce::Client.new(:logger => 'test.salesforce.com')
+```
+
 #### Username/Password authentication
 
 If you prefer to use a username and password to authenticate:

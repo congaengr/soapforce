@@ -3,6 +3,7 @@ module Soapforce
 
     attr_reader :client
     attr_reader :headers
+    attr_accessor :logger
 
     # The partner.wsdl is used by default but can be changed by passing in a new :wsdl option.
     # A client_id can be
@@ -24,11 +25,15 @@ module Soapforce
       @host = options[:host] || "login.salesforce.com"
       @login_url = "https://#{@host}/services/Soap/u/#{@version}"
 
+      @logger = options[:logger] || false
+
       @client = Savon.client(
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
         pretty_print_xml: true,
+        logger: @logger,
+        log: (@logger != false),
         endpoint: @login_url
         )
     end
@@ -77,6 +82,8 @@ module Soapforce
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
+        logger: @logger,
+        log: (@logger != false),
         endpoint: @server_url
       )
 
