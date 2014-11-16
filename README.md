@@ -50,7 +50,7 @@ client = Soapforce::Client.new(:host => 'test.salesforce.com')
 You can specify a logger by passing a logger. Logging is disabled by default.
 
 ```ruby
-client = Soapforce::Client.new(:logger => 'test.salesforce.com')
+client = Soapforce::Client.new(:logger => Logger.new(STDOUT))
 ```
 
 #### Username/Password authentication
