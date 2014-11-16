@@ -83,6 +83,28 @@ describe Soapforce::Client do
     end
   end
 
+  describe "#descibeLayout" do
+
+    it "gets layouts for an sobject type" do
+
+      body = %Q{<tns:describeLayout><tns:sObjectType>Account</tns:sObjectType><tns:recordTypeIds xsi:nil="true"/></tns:describeLayout>}
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_layout_response'})
+
+      subject.describe_layout("Account")
+
+      # Hit cache.
+      subject.describe_layout("Account")
+    end
+
+    it "get the details for a specific layout" do
+
+      body = %Q{<tns:describeLayout><tns:sObjectType>Account</tns:sObjectType><tns:recordTypeIds>012000000000000AAA</tns:recordTypeIds></tns:describeLayout>}
+      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_layout_response'})
+
+      subject.describe_layout('Account', '012000000000000AAA')
+    end
+  end
+
   describe "#retrieve" do
 
     it "should retrieve object by id" do

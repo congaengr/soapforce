@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns="urn:partner.soap.sforce.com" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soapenv:Body>
+    <describeLayoutResponse>
+      <result>
+        <!-- Lots of layout data here -->
+      </result>
+    </describeLayoutResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

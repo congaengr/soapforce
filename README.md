@@ -28,7 +28,7 @@ Or install it yourself as:
 
 ## Usage
 
-For ISV Partners you can specify your client_id in a configuration block which will get included in the CallOptions header of every request.  
+For ISV Partners you can specify your client_id in a configuration block which will get included in the CallOptions header of every request.
 
     # config/initializers/soapforce.rb
     # This is your ISV Partner Client ID.
@@ -135,6 +135,18 @@ client.describe('Account')
 # get the describe for Account and Opportunity object
 client.describe(['Account', 'Opportunity'])
 # => [{ ... },{ ... }]
+```
+
+### describe_layout
+
+```ruby
+# get layouts for an sobject type
+client.describe_layout('Account')
+# => { ... }
+
+# get the details for a specific layout
+client.describe_layout('Account', '012000000000000AAA')
+# => { ... }
 ```
 
 ### logout

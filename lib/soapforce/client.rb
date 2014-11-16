@@ -8,6 +8,7 @@ module Soapforce
     # A client_id can be
     def initialize(options={})
       @describe_cache = {}
+      @describe_layout_cache = {}
       @headers = {}
 
       @wsdl = options[:wsdl] || File.dirname(__FILE__) + "/../../resources/partner.wsdl.xml"
@@ -146,6 +147,36 @@ module Soapforce
         else
           response = @describe_cache[sobject_type]
         end
+      end
+
+      response
+    end
+
+    # Public: Returns the layout for the specified object
+    #
+    # sobject - String name of the sobject.
+    #
+    # Examples
+    #
+    #   # get layouts for an sobject type
+    #   client.describe_layout('Account')
+    #   # => { ... }
+    #
+    #   # get layouts for an sobject type
+    #   client.describe_layout('Account', '012000000000000AAA')
+    #   # => { ... }
+    #
+    # Returns the Hash representation of the describe call.
+    def describe_layout(sobject_type, layout_id=nil)
+      # Cache objects to avoid repeat lookups.
+      @describe_layout_cache[sobject_type] ||={}
+
+      # nil key is for full object.
+      if @describe_layout_cache[sobject_type][layout_id].nil?
+        response = call_soap_api(:describe_layout, :sObjectType => sobject_type, :recordTypeIds => layout_id)
+        @describe_layout_cache[sobject_type][layout_id] = response
+      else
+        response = @describe_layout_cache[sobject_type][layout_id]
       end
 
       response
