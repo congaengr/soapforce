@@ -5,24 +5,30 @@ module Soapforce
     attr_reader :headers
 
     # The partner.wsdl is used by default but can be changed by passing in a new :wsdl option.
-    # A client_id can be 
+    # A client_id can be
     def initialize(options={})
       @describe_cache = {}
       @headers = {}
+
       @wsdl = options[:wsdl] || File.dirname(__FILE__) + "/../../resources/partner.wsdl.xml"
 
-      # If a client_id is provided then it needs to be included 
+      # If a client_id is provided then it needs to be included
       # in the header for every request.  This allows ISV Partners
       # to make SOAP calls in Professional/Group Edition organizations.
 
       client_id = options[:client_id] || Soapforce.configuration.client_id
       @headers = {"tns:CallOptions" => {"tns:client" => client_id}} if client_id
 
+      @version = options[:version] || Soapforce.configuration.version || 28.0
+      @host = options[:host] || "login.salesforce.com"
+      @login_url = "https://#{@host}/services/Soap/u/#{@version}"
+
       @client = Savon.client(
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
-        pretty_print_xml: true
+        pretty_print_xml: true,
+        endpoint: @login_url
         )
     end
 
@@ -129,7 +135,7 @@ module Soapforce
     def describe(sobject_type)
       if sobject_type.is_a?(Array)
         list = sobject_type.map do |type|
-          {:sObjectType => type} 
+          {:sObjectType => type}
         end
         response = call_soap_api(:describe_s_objects, :sObjectType => sobject_type)
       else

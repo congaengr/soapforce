@@ -37,6 +37,13 @@ For ISV Partners you can specify your client_id in a configuration block which w
       config.client_id     = "ParterName/SomeValue/"
     end
 
+### Sandbox Orgs
+
+You can connect to sandbox orgs by specifying a host. The default host is 'login.salesforce.com':
+
+```ruby
+client = Soapforce::Client.new(:host => 'test.salesforce.com')
+```
 
 #### Username/Password authentication
 
