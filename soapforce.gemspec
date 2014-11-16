@@ -3,32 +3,24 @@ lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'soapforce/version'
 
-Gem::Specification.new do |gem|
-  gem.name          = "soapforce"
-  gem.version       = Soapforce::VERSION
-  gem.authors       = ["Joe Heth"]
-  gem.email         = ["joeheth@gmail.com"]
-  gem.description   = %q{A ruby client for the Salesforce SOAP API based on Savon.}
-  gem.summary       = %q{Wraps Savon with helper methods and custom types for interacting with the Salesforce SOAP API.}
-  gem.homepage      = "https://github.com/TinderBox/soapforce"
-  gem.license       = 'MIT'
+Gem::Specification.new do |spec|
+  spec.name          = "soapforce"
+  spec.version       = Soapforce::VERSION
+  spec.authors       = ["Joe Heth"]
+  spec.email         = ["joeheth@gmail.com"]
+  spec.description   = %q{A ruby client for the Salesforce SOAP API based on Savon.}
+  spec.summary       = %q{Wraps Savon with helper methods and custom types for interacting with the Salesforce SOAP API.}
+  spec.homepage      = "https://github.com/TinderBox/soapforce"
+  spec.license       = 'MIT'
 
-  ignores  = File.readlines('.gitignore').grep(/\S+/).map(&:chomp)
-  dotfiles = %w[.gitignore .travis.yml]
+  spec.files         = `git ls-files`.split($/)
+  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.require_paths = ["lib"]
 
-  all_files_without_ignores = Dir['**/*'].reject { |f|
-    File.directory?(f) || ignores.any? { |i| File.fnmatch(i, f) }
-  }
+  spec.add_runtime_dependency "savon", "~>2.3.0", '>= 2.3.0'
 
-  gem.files = (all_files_without_ignores + dotfiles).sort
-
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.require_paths = ["lib"]
-
-  gem.add_dependency("savon", "~>2.3.0")
-
-  gem.add_development_dependency 'rspec', '~> 2.14.0'
-  gem.add_development_dependency 'webmock', '~> 1.13.0'
-  gem.add_development_dependency 'simplecov', '~> 0.7.1'
+  spec.add_development_dependency 'rspec', '~> 2.14.0', '>= 2.14.0'
+  spec.add_development_dependency 'webmock', '~> 1.17.0', '>= 1.17.0'
+  spec.add_development_dependency 'simplecov', '~> 0.9.0', '>= 0.9.0'
 end
