@@ -26,6 +26,8 @@ module Soapforce
       @login_url = "https://#{@host}/services/Soap/u/#{@version}"
 
       @logger = options[:logger] || false
+      # Due to recent SSLv3 POODLE vulnerabilty we default to TLSv1
+      @ssl_version = options[:ssl_version] || :TLSv1
 
       @client = Savon.client(
         wsdl: @wsdl,
@@ -34,7 +36,8 @@ module Soapforce
         pretty_print_xml: true,
         logger: @logger,
         log: (@logger != false),
-        endpoint: @login_url
+        endpoint: @login_url,
+        ssl_version: @ssl_version # Sets ssl_version for HTTPI adapter
         )
     end
 
@@ -84,7 +87,8 @@ module Soapforce
         convert_request_keys_to: :none,
         logger: @logger,
         log: (@logger != false),
-        endpoint: @server_url
+        endpoint: @server_url,
+        ssl_version: @ssl_version # Sets ssl_version for HTTPI adapter
       )
 
       # If a session_id/server_url were passed in then invoke get_user_info for confirmation.
