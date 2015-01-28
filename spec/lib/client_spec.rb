@@ -400,6 +400,46 @@ describe Soapforce::Client do
 
   end
 
+  describe "#merge" do
+    before(:each) do
+      @body = "<tns:merge><tns:request><tns:masterRecord xsi:type=\"Account\"><tns:id>001160000000000AAG</tns:id></tns:masterRecord><tns:recordToMergeIds>001140000000000AA4</tns:recordToMergeIds><tns:recordToMergeIds>001150000000000AAO</tns:recordToMergeIds></tns:request></tns:merge>"
+      @object   = { id: "001160000000000AAG" }
+      @to_merge = ['001140000000000AA4','001150000000000AAO']
+    end
+
+    it "merges objects together" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
+      response = subject.merge("Account", @object, @to_merge)
+
+      response[:success].should be_true
+      response[:id].should == @object[:id]
+      response[:merged_record_ids].sort.should == @to_merge
+    end
+
+    it "returns false if merge fails" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response_failure'})
+      response = subject.merge("Account", @object, @to_merge)
+
+      response.should be_false
+    end
+
+    it "merges objects with a bang" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
+      response = subject.merge!("Account", @object, @to_merge)
+
+      response[:success].should be_true
+      response[:id].should == @object[:id]
+      response[:merged_record_ids].sort.should == @to_merge
+    end
+
+    it "raises an exception if merge fails" do
+      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response_failure'})
+      expect {
+        subject.merge!('Account', @object, @to_merge)
+      }.to raise_error(Savon::Error)
+    end
+  end
+
   describe "process" do
 
     it "process submit request without approvers" do
