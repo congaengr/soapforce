@@ -341,7 +341,8 @@ module Soapforce
 
     # Public: Merges records together
     #
-    # master_record - MasterRecord object
+    # sobject       - String name of the sobject
+    # master_record - Hash of the master record that other records will be merged into
     # ids           - Array of Salesforce Ids that will be merged into the master record
     #
     # Examples
@@ -362,7 +363,8 @@ module Soapforce
 
     # Public: Merges records together
     #
-    # master_record - MasterRecord object
+    # sobject       - String name of the sobject
+    # master_record - Hash of the master record that other records will be merged into
     # ids           - Array of Salesforce Ids that will be merged into the master record
     #
     # Examples
