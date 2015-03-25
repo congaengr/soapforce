@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com">
+  <soapenv:Body>
+    <mergeResponse>
+      <result>
+        <id>001160000000000AAG</id>
+        <mergedRecordIds>001140000000000AA4</mergedRecordIds>
+        <mergedRecordIds>001150000000000AAO</mergedRecordIds>
+        <success>true</success>
+      </result>
+    </mergeResponse>
+  </soapenv:Body>
+</soapenv:Envelope>

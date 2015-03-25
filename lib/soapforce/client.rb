@@ -339,6 +339,46 @@ module Soapforce
     end
     alias_method :destroy!, :delete
 
+    # Public: Merges records together
+    #
+    # sobject       - String name of the sobject
+    # master_record - Hash of the master record that other records will be merged into
+    # ids           - Array of Salesforce Ids that will be merged into the master record
+    #
+    # Examples
+    #
+    #   client.merge('Account', Id: '0016000000MRatd', ['012000000000000AAA'])
+    #
+    # Returns Hash if the records were merged successfully
+    # Raises an exception if an error is returned from Salesforce.
+    def merge!(sobject_type, master_record_hash, ids)
+      call_soap_api(
+        :merge,
+        request: {
+          masterRecord: master_record_hash.merge(:'@xsi:type' => sobject_type),
+          recordToMergeIds: ids
+        }
+      )
+    end
+
+    # Public: Merges records together
+    #
+    # sobject       - String name of the sobject
+    # master_record - Hash of the master record that other records will be merged into
+    # ids           - Array of Salesforce Ids that will be merged into the master record
+    #
+    # Examples
+    #
+    #   client.merge('Account', Id: '0016000000MRatd', ['012000000000000AAA'])
+    #
+    # Returns Hash if the records were merged successfully
+    # Raises an exception if an error is returned from Salesforce.
+    def merge(sobject_type, master_record_hash, ids)
+      merge!(sobject_type, master_record_hash, ids)
+    rescue => e
+      false
+    end
+
     # Public: Finds a single record and returns all fields.
     #
     # sobject - The String name of the sobject.

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:partner.soap.sforce.com">
+  <soapenv:Body>
+    <mergeResponse>
+      <result>
+        <errors>
+          <message>bad id in recordsToMerge: 0011500000000</message>
+          <statusCode>MALFORMED_ID</statusCode>
+        </errors>
+        <id>001160000000000AAG</id>
+        <success>false</success>
+      </result>
+    </mergeResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
