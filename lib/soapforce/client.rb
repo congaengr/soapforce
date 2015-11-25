@@ -3,6 +3,7 @@ module Soapforce
 
     attr_reader :client
     attr_reader :headers
+    attr_reader :tag_style
     attr_accessor :logger
 
     # The partner.wsdl is used by default but can be changed by passing in a new :wsdl option.
@@ -29,10 +30,19 @@ module Soapforce
       # Due to recent SSLv3 POODLE vulnerabilty we default to TLSv1
       @ssl_version = options[:ssl_version] || :TLSv1
 
+      if options[:tag_style] == :raw
+        @tag_style = :raw
+        @response_tags = lambda { |key| key }
+      else
+        @tag_style = :snakecase
+        @response_tags = lambda { |key| key.snakecase.to_sym }
+      end
+
       @client = Savon.client(
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
+        convert_response_tags_to: @response_tags,
         pretty_print_xml: true,
         logger: @logger,
         log: (@logger != false),
@@ -67,10 +77,10 @@ module Soapforce
           locals.message :username => options[:username], :password => options[:password]
         end
 
-        result = response.to_hash[:login_response][:result]
+        result = response.to_hash[key_name(:login_response)][key_name(:result)]
+        @session_id = result[key_name(:session_id)]
+        @server_url = result[key_name(:server_url)]
 
-        @session_id = result[:session_id]
-        @server_url = result[:server_url]
       elsif options[:session_id] && options[:server_url]
         @session_id = options[:session_id]
         @server_url = options[:server_url]
@@ -84,6 +94,7 @@ module Soapforce
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
+        convert_response_tags_to: @response_tags,
         logger: @logger,
         log: (@logger != false),
         endpoint: @server_url,
@@ -110,7 +121,7 @@ module Soapforce
     # Returns an Array of String names for each SObject.
     def list_sobjects
       response = describe_global # method_missing
-      response[:sobjects].collect { |sobject| sobject[:name] }
+      response[key_name(:sobjects)].collect { |sobject| sobject[key_name(:name)] }
     end
 
     # Public: Get the current organization's Id.
@@ -123,9 +134,7 @@ module Soapforce
     # Returns the String organization Id
     def org_id
       object = query('SELECT Id FROM Organization').first
-      if object && object[:id]
-        return object[:id].is_a?(Array) ? object[:id].first : object[:id]
-      end
+      object.Id if object
     end
 
     # Public: Returns a detailed describe result for the specified sobject
@@ -190,19 +199,16 @@ module Soapforce
     end
 
     def query(soql)
-      result = call_soap_api(:query, {:queryString => soql})
-      QueryResult.new(result)
+      call_soap_api(:query, {:queryString => soql})
     end
 
     # Includes deleted (isDeleted) or archived (isArchived) records
     def query_all(soql)
-      result = call_soap_api(:query_all, {:queryString => soql})
-      QueryResult.new(result)
+      call_soap_api(:query_all, {:queryString => soql})
     end
 
     def query_more(locator)
-      result = call_soap_api(:query_more, {:queryLocator => locator})
-      QueryResult.new(result)
+      call_soap_api(:query_more, {:queryLocator => locator})
     end
 
     def search(sosl)
@@ -445,7 +451,7 @@ module Soapforce
       field_details = field_details(sobject, field_name)
       field_names = field_list(sobject).join(", ")
 
-      if ["int", "currency", "double", "boolean", "percent"].include?(field_details[:type])
+      if ["int", "currency", "double", "boolean", "percent"].include?(field_details[key_name(:type)])
         search_value = id
       else
         # default to quoted value
@@ -467,8 +473,7 @@ module Soapforce
     # Returns Hash of sobject record.
     def retrieve(sobject, id)
       ids = id.is_a?(Array) ? id : [id]
-      sobject = call_soap_api(:retrieve, {fieldList: field_list(sobject).join(","), sObjectType: sobject, ids: ids})
-      sobject ? SObject.new(sobject) : nil
+      call_soap_api(:retrieve, {fieldList: field_list(sobject).join(","), sObjectType: sobject, ids: ids})
     end
 
     # ProcessSubmitRequest
@@ -511,13 +516,15 @@ module Soapforce
 
     def field_list(sobject)
       description = describe(sobject)
-      description[:fields].collect {|c| c[:name] }
+      name_key = key_name(:name)
+      description[key_name(:fields)].collect {|c| c[name_key] }
     end
 
     def field_details(sobject, field_name)
       description = describe(sobject)
-      fields = description[:fields]
-      fields.find {|f| field_name.downcase == f[:name].downcase }
+      fields = description[key_name(:fields)]
+      name_key = key_name(:name)
+      fields.find {|f| field_name.downcase == f[name_key].downcase }
     end
 
     # Supports the following No Argument methods:
@@ -531,26 +538,51 @@ module Soapforce
       call_soap_api(method, *args)
     end
 
+    def key_name(key)
+      if @tag_style == :snakecase
+        key.is_a?(Symbol) ? key : key.snakecase.to_sym
+      else
+        if key.to_s.include?('_')
+          camel_key = key.to_s.gsub(/\_(\w{1})/) {|cap| cap[1].upcase }
+        else
+          key.to_s
+        end
+      end
+    end
+
     def call_soap_api(method, message_hash={})
 
       response = @client.call(method.to_sym) do |locals|
         locals.message message_hash
       end
+
       # Convert SOAP XML to Hash
       response = response.to_hash
 
       # Get Response Body
-      response_body = response["#{method}_response".to_sym]
+      key = key_name("#{method}Response")
+      response_body = response[key]
 
       # Grab result section if exists.
-      result = response_body ? response_body[:result] : nil
+      result = response_body ? response_body[key_name(:result)] : nil
 
       # Raise error when response contains errors
-      if result && result.is_a?(Hash) && result[:success] == false && result[:errors]
-        raise Savon::Error.new("#{result[:errors][:status_code]}: #{result[:errors][:message]}")
+      if result.is_a?(Hash)
+        xsi_type = result[key_name(:"@xsi:type")].to_s
+
+        if result[key_name(:success)] == false && result[key_name(:errors)]
+          errors = result[key_name(:errors)]
+          raise Savon::Error.new("#{errors[key_name(:status_code)]}: #{errors[key_name(:message)]}")
+        elsif xsi_type.include?("sObject")
+          result = SObject.new(result)
+        elsif xsi_type.include?("QueryResult")
+          result = QueryResult.new(result)
+        else
+          result = Result.new(result)
+        end
       end
 
-      return result
+      result
     end
 
     def sobjects_hash(sobject_type, sobject_hash)
