@@ -28,12 +28,12 @@ module FixtureHelpers
     def soap_envelope(headers, body)
 envelope = <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xmlns:tns="urn:partner.soap.sforce.com" 
-xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" 
-xmlns:ins0="urn:sobject.partner.soap.sforce.com" 
-xmlns:ins1="urn:fault.partner.soap.sforce.com">
+<env:Envelope xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:tns="urn:partner.soap.sforce.com"
+ xmlns:env="http://schemas.xmlsoap.org/soap/envelope/"
+ xmlns:ins0="urn:sobject.partner.soap.sforce.com"
+ xmlns:ins1="urn:fault.partner.soap.sforce.com">
 #{soap_headers(headers)}
 <env:Body>#{body}</env:Body>
 </env:Envelope>

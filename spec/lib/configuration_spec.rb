@@ -10,7 +10,7 @@ describe Soapforce do
     subject { Soapforce.configuration }
 
     it { should be_a Soapforce::Configuration }
-    it { subject.client_id.should be_nil }
+    it { expect(subject.client_id).to be_nil }
 
   end
 

@@ -19,6 +19,10 @@ module Soapforce
       @raw_hash[index.to_sym] = value
     end
 
+    def has_key?(key)
+      @raw_hash.has_key?(key)
+    end
+
     # Allows method-like access to the hash using camelcase field names.
     def method_missing(method, *args, &block)
 

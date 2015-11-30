@@ -68,7 +68,6 @@ module Soapforce
         end
 
         result = response.to_hash[:login_response][:result]
-        returned_endpoint = result[:server_url]
 
         @session_id = result[:session_id]
         @server_url = result[:server_url]
@@ -123,7 +122,7 @@ module Soapforce
     #
     # Returns the String organization Id
     def org_id
-      object = query('select id from Organization').first
+      object = query('SELECT Id FROM Organization').first
       if object && object[:id]
         return object[:id].is_a?(Array) ? object[:id].first : object[:id]
       end
@@ -146,14 +145,11 @@ module Soapforce
     # Returns the Hash representation of the describe call.
     def describe(sobject_type)
       if sobject_type.is_a?(Array)
-        list = sobject_type.map do |type|
-          {:sObjectType => type}
-        end
-        response = call_soap_api(:describe_s_objects, :sObjectType => sobject_type)
+        response = call_soap_api(:describe_s_objects, sObjectType: sobject_type)
       else
         # Cache objects to avoid repeat lookups.
         if @describe_cache[sobject_type].nil?
-          response = call_soap_api(:describe_s_object, :sObjectType => sobject_type)
+          response = call_soap_api(:describe_s_object, sObjectType: sobject_type)
           @describe_cache[sobject_type] = response
         else
           response = @describe_cache[sobject_type]
@@ -228,7 +224,7 @@ module Soapforce
     # Returns false if something bad happens.
     def create(sobject_type, properties)
       create!(sobject_type, properties)
-    rescue => e
+    rescue
       false
     end
 
@@ -263,7 +259,7 @@ module Soapforce
     # Returns false if there was an error.
     def update(sobject_type, properties)
       update!(sobject_type, properties)
-    rescue => e
+    rescue
       false
     end
 
@@ -316,7 +312,7 @@ module Soapforce
     # Returns false if an error is returned from Salesforce.
     def delete(id)
       delete!(id)
-    rescue => e
+    rescue
       false
     end
     alias_method :destroy, :delete
@@ -375,7 +371,7 @@ module Soapforce
     # Raises an exception if an error is returned from Salesforce.
     def merge(sobject_type, master_record_hash, ids)
       merge!(sobject_type, master_record_hash, ids)
-    rescue => e
+    rescue
       false
     end
 
@@ -433,8 +429,8 @@ module Soapforce
         field_names = select_fields
       end
 
-      soql = "Select #{field_names.join(", ")} From #{sobject} Where #{where_clause}"
-      result = query(soql)
+      soql = "SELECT #{field_names.join(", ")} FROM #{sobject} WHERE #{where_clause}"
+      query(soql)
     end
 
     # Public: Finds a single record and returns all fields.
@@ -456,7 +452,7 @@ module Soapforce
         search_value = "'#{id}'"
       end
 
-      soql = "Select #{field_names} From #{sobject} Where #{field_name} = #{search_value}"
+      soql = "SELECT #{field_names} FROM #{sobject} WHERE #{field_name} = #{search_value}"
       result = query(soql)
       # Return first query result.
       result ? result.first : nil
@@ -515,7 +511,7 @@ module Soapforce
 
     def field_list(sobject)
       description = describe(sobject)
-      field_list = description[:fields].collect {|c| c[:name] }
+      description[:fields].collect {|c| c[:name] }
     end
 
     def field_details(sobject, field_name)
