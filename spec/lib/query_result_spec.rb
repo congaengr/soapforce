@@ -4,15 +4,15 @@ describe Soapforce::QueryResult do
 
   describe 'empty object' do
     subject { Soapforce::QueryResult.new }
-    
+
     context "should have defaults" do
-      it { subject.size.should == 0 }
-      it { subject.query_locator.should be_nil }
-      it { subject.first.should be_nil }
-      it { subject.last.should be_nil }
-      it { subject.should be_done }
+      it { expect(subject.size).to eq 0 }
+      it { expect(subject.query_locator).to be_nil }
+      it { expect(subject.first).to be_nil }
+      it { expect(subject.last).to be_nil }
+      it { expect(subject).to be_done }
     end
-    
+
   end
 
   describe 'result object' do
@@ -29,16 +29,16 @@ describe Soapforce::QueryResult do
         Soapforce::QueryResult.new(hash)
       }
 
-      it { subject.size.should == 1 }
-      it { subject.query_locator.should be_nil }
-      it { subject.should be_done }
-      
+      it { expect(subject.size).to eq 1 }
+      it { expect(subject.query_locator).to be_nil }
+      it { expect(subject).to be_done }
+
       it "#each" do
         count = 0
         subject.each do |obj|
           count +=1
-          obj[:id].should == count
-          obj.Id.should == count
+          expect(obj[:id]).to eq count
+          expect(obj.Id).to eq count
         end
         expect(count).to be(1)
       end
@@ -59,16 +59,16 @@ describe Soapforce::QueryResult do
         Soapforce::QueryResult.new(hash)
       }
 
-      it { subject.size.should == 2 }
-      it { subject.query_locator.should be_nil }
-      it { subject.should be_done }
-      
+      it { expect(subject.size).to eq 2 }
+      it { expect(subject.query_locator).to be_nil }
+      it { expect(subject).to be_done }
+
       it "#each" do
         count = 0
         subject.each do |obj|
           count +=1
-          obj[:id].should == count
-          obj.Id.should == count
+          expect(obj[:id]).to eq count
+          expect(obj.Id).to eq count
         end
         expect(count).to be(2)
       end

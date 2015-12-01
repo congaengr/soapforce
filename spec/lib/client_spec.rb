@@ -5,8 +5,8 @@ describe Soapforce::Client do
 
   describe "#operations" do
     it "should return list of operations from the wsdl" do
-      subject.operations.should be_a(Array)
-      subject.operations.should include(:login, :logout, :query, :create)
+      expect(subject.operations).to be_an(Array)
+      expect(subject.operations).to include(:login, :logout, :query, :create)
     end
   end
 
@@ -32,8 +32,8 @@ describe Soapforce::Client do
 
       user_info = subject.login(session_id: 'abcde12345', server_url: 'https://na15.salesforce.com')
 
-      user_info[:user_email].should == "johndoe@email.com"
-      user_info[:user_full_name].should == "John Doe"
+      expect(user_info[:user_email]).to eq "johndoe@email.com"
+      expect(user_info[:user_full_name]).to eq "John Doe"
     end
 
     it "should raise arugment error when no parameters are passed" do
@@ -45,19 +45,19 @@ describe Soapforce::Client do
     it "should return array of object names" do
 
       body = "<tns:describeGlobal></tns:describeGlobal>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_global_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'describe_global_response'})
 
-      subject.list_sobjects.should == ['Account', 'AccountContactRole']
+      expect(subject.list_sobjects).to eq ['Account', 'AccountContactRole']
     end
   end
 
   describe "org_id" do
     it "should return organization id" do
 
-      body = "<tns:query><tns:queryString>select id from Organization</tns:queryString></tns:query>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'org_id_response'})
+      body = "<tns:query><tns:queryString>SELECT Id FROM Organization</tns:queryString></tns:query>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'org_id_response'})
 
-      subject.org_id.should == "00DA0000000YpZ4MAK"
+      expect(subject.org_id).to eq "00DA0000000YpZ4MAK"
     end
   end
 
@@ -66,7 +66,7 @@ describe Soapforce::Client do
     it "supports single sobject name" do
 
       body = "<tns:describeSObject><tns:sObjectType>Opportunity</tns:sObjectType></tns:describeSObject>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_s_object_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'describe_s_object_response'})
 
       subject.describe("Opportunity")
 
@@ -77,7 +77,7 @@ describe Soapforce::Client do
     it "supports array of sobject names" do
 
       body = "<tns:describeSObjects><tns:sObjectType>Account</tns:sObjectType><tns:sObjectType>Opportunity</tns:sObjectType></tns:describeSObjects>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_s_objects_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'describe_s_objects_response'})
 
       subject.describe(["Account", "Opportunity"])
     end
@@ -88,7 +88,7 @@ describe Soapforce::Client do
     it "gets layouts for an sobject type" do
 
       body = %Q{<tns:describeLayout><tns:sObjectType>Account</tns:sObjectType><tns:recordTypeIds xsi:nil="true"/></tns:describeLayout>}
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_layout_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'describe_layout_response'})
 
       subject.describe_layout("Account")
 
@@ -99,7 +99,7 @@ describe Soapforce::Client do
     it "get the details for a specific layout" do
 
       body = %Q{<tns:describeLayout><tns:sObjectType>Account</tns:sObjectType><tns:recordTypeIds>012000000000000AAA</tns:recordTypeIds></tns:describeLayout>}
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'describe_layout_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'describe_layout_response'})
 
       subject.describe_layout('Account', '012000000000000AAA')
     end
@@ -110,19 +110,19 @@ describe Soapforce::Client do
     it "should retrieve object by id" do
       fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
       body = "<tns:retrieve><tns:fieldList>Id,Name,Description,StageName</tns:fieldList><tns:sObjectType>Opportunity</tns:sObjectType><tns:ids>006A000000LbkT5IAJ</tns:ids></tns:retrieve>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
 
       sobject = subject.retrieve("Opportunity", "006A000000LbkT5IAJ")
 
-      sobject.should be_a(Soapforce::SObject)
-      sobject.type.should == "Opportunity"
-      sobject.Id.should == "006A000000LbkT5IAJ"
-      sobject.Name.should == "SOAPForce Opportunity"
-      sobject.Description.should be_nil
-      sobject.StageName.should == "Prospecting"
+      expect(sobject).to be_instance_of(Soapforce::SObject)
+      expect(sobject.type).to eq "Opportunity"
+      expect(sobject.Id).to eq "006A000000LbkT5IAJ"
+      expect(sobject.Name).to eq "SOAPForce Opportunity"
+      expect(sobject.Description).to be_nil
+      expect(sobject.StageName).to eq "Prospecting"
     end
   end
 
@@ -131,19 +131,19 @@ describe Soapforce::Client do
 
       fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
       body = "<tns:retrieve><tns:fieldList>Id,Name,Description,StageName</tns:fieldList><tns:sObjectType>Opportunity</tns:sObjectType><tns:ids>006A000000LbkT5IAJ</tns:ids></tns:retrieve>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'retrieve_response'})
 
       sobject = subject.find("Opportunity", "006A000000LbkT5IAJ")
 
-      sobject.should be_a(Soapforce::SObject)
-      sobject.type.should == "Opportunity"
-      sobject.Id.should == "006A000000LbkT5IAJ"
-      sobject.Name.should == "SOAPForce Opportunity"
-      sobject.Description.should be_nil
-      sobject.StageName.should == "Prospecting"
+      expect(sobject).to be_instance_of(Soapforce::SObject)
+      expect(sobject.type).to eq "Opportunity"
+      expect(sobject.Id).to eq "006A000000LbkT5IAJ"
+      expect(sobject.Name).to eq "SOAPForce Opportunity"
+      expect(sobject.Description).to be_nil
+      expect(sobject.StageName).to eq "Prospecting"
     end
 
   end
@@ -153,10 +153,10 @@ describe Soapforce::Client do
     it "should retrieve object by string field" do
       fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).exactly(2).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).exactly(2).with("Opportunity").and_return(fields)
 
-      body = "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where StageName = 'Prospecting'</tns:queryString></tns:query>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      body = "<tns:query><tns:queryString>SELECT Id, Name, Description, StageName FROM Opportunity WHERE StageName = &#39;Prospecting&#39;</tns:queryString></tns:query>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
 
       subject.find_by_field("Opportunity", "Prospecting", "StageName")
     end
@@ -164,10 +164,10 @@ describe Soapforce::Client do
     it "should retrieve object by number field" do
       fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "Amount", :type => "double"}]}
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).exactly(2).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).exactly(2).with("Opportunity").and_return(fields)
 
-      body = "<tns:query><tns:queryString>Select Id, Name, Description, Amount From Opportunity Where Amount = 0.0</tns:queryString></tns:query>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      body = "<tns:query><tns:queryString>SELECT Id, Name, Description, Amount FROM Opportunity WHERE Amount = 0.0</tns:queryString></tns:query>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
 
       subject.find_by_field("Opportunity", 0.0, "Amount")
     end
@@ -177,44 +177,44 @@ describe Soapforce::Client do
   describe "#find_where" do
 
     let(:fields) { {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]} }
-    let(:body) { "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where Id = '006A000000LbkT5IAJ' AND Amount = 0.0</tns:queryString></tns:query>" }
+    let(:body) { "<tns:query><tns:queryString>SELECT Id, Name, Description, StageName FROM Opportunity WHERE Id = &#39;006A000000LbkT5IAJ&#39; AND Amount = 0.0</tns:queryString></tns:query>" }
 
     after(:each) do
-      @result.should be_a(Soapforce::QueryResult)
-      @result.size.should == 2
-      @result.first.Name == "Opportunity 1"
-      @result.last.Name == "Opportunity 2"
+      expect(@result).to be_instance_of(Soapforce::QueryResult)
+      expect(@result.size).to eq 2
+      expect(@result.first.Name).to eq "Opportunity 1"
+      expect(@result.last.Name).to eq "Opportunity 2"
     end
 
     it "should retrieve records from hash conditions" do
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
       @result = subject.find_where("Opportunity", {Id: "006A000000LbkT5IAJ", Amount: 0.0})
     end
 
     it "should retrieve records from hash condition using IN clause" do
-      body = "<tns:query><tns:queryString>Select Id, Name, Description, StageName From Opportunity Where Id IN ('006A000000LbkT5IAJ', '006A000000AbkTcIAQ')</tns:queryString></tns:query>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      body = "<tns:query><tns:queryString>SELECT Id, Name, Description, StageName FROM Opportunity WHERE Id IN (&#39;006A000000LbkT5IAJ&#39;, &#39;006A000000AbkTcIAQ&#39;)</tns:queryString></tns:query>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
 
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
       @result = subject.find_where("Opportunity", {Id: ["006A000000LbkT5IAJ", "006A000000AbkTcIAQ"]})
     end
 
     it "should retrieve records from string condition" do
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
       # retrieve calls describe to get the list of available fields.
-      subject.should_receive(:describe).with("Opportunity").and_return(fields)
+      expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
       @result = subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0")
     end
 
     it "should retrieve records from string condition and specify fields" do
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
-      subject.should_not_receive(:describe)
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      expect(subject).to_not receive(:describe)
 
       @result = subject.find_where("Opportunity", "Id = '006A000000LbkT5IAJ' AND Amount = 0.0", ["Id", "Name", "Description", "StageName"])
     end
@@ -224,29 +224,31 @@ describe Soapforce::Client do
   describe "query methods" do
 
     after(:each) do
-      @result.should be_a(Soapforce::QueryResult)
-      @result.size.should == 2
-      @result.first.Name == "Opportunity 1"
-      @result.last.Name == "Opportunity 2"
+      expect(@result).to be_instance_of(Soapforce::QueryResult)
+      expect(@result.size).to eq 2
+      expect(@result.first.Name).to eq "Opportunity 1"
+      expect(@result.last.Name).to eq "Opportunity 2"
     end
 
     it "#query" do
-      body = "<tns:query><tns:queryString>Select Id, Name, StageName from Opportunity</tns:queryString></tns:query>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
+      soql = "SELECT Id, Name, StageName FROM Opportunity"
+      body = "<tns:query><tns:queryString>#{soql}</tns:queryString></tns:query>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_response'})
 
-      @result = subject.query("Select Id, Name, StageName from Opportunity")
+      @result = subject.query(soql)
     end
 
     it "#query_all" do
-      body = "<tns:queryAll><tns:queryString>Select Id, Name, StageName from Opportunity</tns:queryString></tns:queryAll>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_all_response'})
+      soql = "SELECT Id, Name, StageName FROM Opportunity"
+      body = "<tns:queryAll><tns:queryString>#{soql}</tns:queryString></tns:queryAll>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_all_response'})
 
-      @result = subject.query_all("Select Id, Name, StageName from Opportunity")
+      @result = subject.query_all(soql)
     end
 
     it "#query_more" do
       body = "<tns:queryMore><tns:queryLocator>some_locator_string</tns:queryLocator></tns:queryMore>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'query_more_response'})
+      stub_api_request(endpoint, {with_body: body, fixture: 'query_more_response'})
 
       @result = subject.query_more("some_locator_string")
     end
@@ -258,9 +260,9 @@ describe Soapforce::Client do
     it "should return search results" do
 
       sosl = "FIND 'Name*' IN ALL FIELDS RETURNING Account (Id, Name), Contact, Opportunity, Lead"
-
-      body = "<tns:search><tns:searchString>#{sosl}</tns:searchString></tns:search>"
-      stub = stub_api_request(endpoint, {with_body: body, fixture: 'search_response'})
+      # single quote encoding changed in ruby 2
+      body = "<tns:search><tns:searchString>FIND &#39;Name*&#39; IN ALL FIELDS RETURNING Account (Id, Name), Contact, Opportunity, Lead</tns:searchString></tns:search>"
+      stub_api_request(endpoint, {with_body: body, fixture: 'search_response'})
 
       subject.search(sosl)
     end
@@ -275,33 +277,33 @@ describe Soapforce::Client do
 
     it "should create new object" do
 
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'create_response'})
       response = subject.create("Opportunity", @params)
 
-      response[:success].should be_true
-      response[:id].should == "006A000000LbiizIAB"
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq "006A000000LbiizIAB"
     end
 
     it "should return false if object not created" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'create_response_failure'})
       response = subject.create("Opportunity", @params)
-      response.should be_false
+      expect(response).to eq false
     end
 
     it "creates! new object" do
 
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'create_response'})
       response = subject.create!("Opportunity", @params)
 
-      response[:success].should be_true
-      response[:id].should == "006A000000LbiizIAB"
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq "006A000000LbiizIAB"
     end
 
     it "raises exception when create! fails" do
 
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'create_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'create_response_failure'})
       expect {
-        response = subject.create!("Opportunity", @params)
+        subject.create!("Opportunity", @params)
       }.to raise_error(Savon::Error)
 
     end
@@ -314,33 +316,31 @@ describe Soapforce::Client do
     end
 
     it "updates existing object" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'update_response'})
       response = subject.update("Opportunity", @params)
 
-      response[:success].should be_true
-      response[:id].should == "006A000000LbiizIAB"
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq "006A000000LbiizIAB"
     end
 
     it "updates! existing object" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'update_response'})
       response = subject.update!("Opportunity", @params)
 
-      response[:success].should be_true
-      response[:id].should == "006A000000LbiizIAB"
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq "006A000000LbiizIAB"
     end
 
     it "returns false when update fails" do
-
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'update_response_failure'})
       response = subject.update("Opportunity", @params)
-      response.should be_false
+      expect(response).to eq false
     end
 
     it "raises exception when update fails" do
-
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'update_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'update_response_failure'})
       expect {
-        response = subject.update!("Opportunity", @params)
+        subject.update!("Opportunity", @params)
       }.to raise_error(Savon::Error)
 
     end
@@ -356,7 +356,7 @@ describe Soapforce::Client do
     end
 
     it "inserts new and updates existing objects" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'upsert_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'upsert_response'})
       subject.upsert("Opportunity", "External_Id__c", @objects)
     end
 
@@ -369,30 +369,30 @@ describe Soapforce::Client do
     end
 
     it "deletes existing object" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
       response = subject.delete(@id)
 
-      response[:success].should be_true
-      response[:id].should == @id
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq @id
     end
 
     it "returns false if delete fails" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response_failure'})
       response = subject.delete(@id)
 
-      response.should be_false
+      expect(response).to eq false
     end
 
     it "deletes existing object with a bang" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
       response = subject.delete!(@id)
 
-      response[:success].should be_true
-      response[:id].should == @id
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq @id
     end
 
     it "raises an exception if delete fails" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response_failure'})
       expect {
         subject.delete!(@id)
       }.to raise_error(Savon::Error)
@@ -408,32 +408,32 @@ describe Soapforce::Client do
     end
 
     it "merges objects together" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
       response = subject.merge("Account", @object, @to_merge)
 
-      response[:success].should be_true
-      response[:id].should == @object[:id]
-      response[:merged_record_ids].sort.should == @to_merge
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq @object[:id]
+      expect(response[:merged_record_ids].sort).to eq @to_merge
     end
 
     it "returns false if merge fails" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response_failure'})
       response = subject.merge("Account", @object, @to_merge)
 
-      response.should be_false
+      expect(response).to eq false
     end
 
     it "merges objects with a bang" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
       response = subject.merge!("Account", @object, @to_merge)
 
-      response[:success].should be_true
-      response[:id].should == @object[:id]
-      response[:merged_record_ids].sort.should == @to_merge
+      expect(response[:success]).to eq true
+      expect(response[:id]).to eq @object[:id]
+      expect(response[:merged_record_ids].sort).to eq @to_merge
     end
 
     it "raises an exception if merge fails" do
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response_failure'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response_failure'})
       expect {
         subject.merge!('Account', @object, @to_merge)
       }.to raise_error(Savon::Error)
@@ -446,32 +446,32 @@ describe Soapforce::Client do
 
       @body = '<tns:process><tns:actions xsi:type="tns:ProcessSubmitRequest"><tns:objectId>a00i0000007JBLJAA4</tns:objectId><tns:comments>Submitting for Approval</tns:comments></tns:actions></tns:process>'
 
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
       response = subject.process({objectId: "a00i0000007JBLJAA4", comments: "Submitting for Approval"})
 
-      response[:success].should be_true
-      response[:new_workitem_ids].should == "04ii000000098uLAAQ"
+      expect(response[:success]).to eq true
+      expect(response[:new_workitem_ids]).to eq "04ii000000098uLAAQ"
     end
 
     it "process submit request with approvers" do
 
       @body = '<tns:process><tns:actions xsi:type="tns:ProcessSubmitRequest"><tns:objectId>a00i0000007JBLJAA4</tns:objectId><tns:comments>Submitting for Approval</tns:comments><tns:nextApproverIds>abcde12345</tns:nextApproverIds></tns:actions></tns:process>'
 
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
       response = subject.process({objectId: "a00i0000007JBLJAA4", comments: "Submitting for Approval", approverIds: "abcde12345"})
 
-      response[:success].should be_true
-      response[:new_workitem_ids].should == "04ii000000098uLAAQ"
+      expect(response[:success]).to eq true
+      expect(response[:new_workitem_ids]).to eq "04ii000000098uLAAQ"
     end
 
     it "process workitem request" do
       @body = '<tns:process><tns:actions xsi:type="tns:ProcessWorkitemRequest"><tns:action>Removed</tns:action><tns:workitemId>a00i0000007JBLJAA4</tns:workitemId><tns:comments>Recalling Request</tns:comments></tns:actions></tns:process>'
 
-      stub = stub_api_request(endpoint, {with_body: @body, fixture: 'process_workitem_request_response'})
+      stub_api_request(endpoint, {with_body: @body, fixture: 'process_workitem_request_response'})
       response = subject.process({action: "Removed", workitemId: "a00i0000007JBLJAA4", comments: "Recalling Request"})
 
-      response[:success].should be_true
-      response[:instance_status].should == "Removed"
+      expect(response[:success]).to eq true
+      expect(response[:instance_status]).to eq "Removed"
     end
   end
 
