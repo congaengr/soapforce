@@ -561,11 +561,44 @@ module Soapforce
         sobjects = [sobject_hash]
       end
 
+      # Check if there are any related objects' external IDs being used to set up relationships
+      related_external_id_references(sobject_type, sobjects) if sobjects.first.keys.any? { |k| k =~ /\./ }
+
       sobjects.map! do |obj|
         {"ins0:type" => sobject_type}.merge(obj)
       end
 
       {sObjects: sobjects}
+    end
+
+    # If there are relationships described using dot-syntax in the input 
+    # data, process them and build the proper nested hash - ex.
+    #
+    #   {"Foo_Relationship__r.Foo_Field__c" => "Bar_Value"} becomes
+    #
+    #   {"Foo_Relationship__r" => {:"@xsi:type" => "Foo_Object__c", "Foo_Field__c" => "Bar_Value"}}
+    #
+    def related_external_id_references(sobject_type, sobjects)
+
+      metadata = describe(sobject_type)
+
+      # Get only the keys that contain relationships described with dot-syntax
+      sobjects.first.keys.select { |key| key =~ /\./ }.each do |key|
+
+        rel_name, target_field = key.split('.')
+
+        unless field_metadata = metadata[:fields].find { |f| f[:relationship_name].eql? rel_name }
+          raise ArgumentError.new("No relationship '#{rel_name}' could be found for the sObject type '#{sobject_type}'")
+        end
+
+        referenced_sobject = field_metadata[:reference_to]
+
+        sobjects.map! do |obj|
+          value = obj.delete(key)
+          {rel_name => {:"@xsi:type" => referenced_sobject, target_field => value }}.merge(obj) unless value.nil?
+        end
+
+      end
     end
   end
 end
