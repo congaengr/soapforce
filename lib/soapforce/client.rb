@@ -598,9 +598,6 @@ module Soapforce
           value = obj.delete(key)
           obj.update(rel_name => {:"@xsi:type" => referenced_sobject, target_field => value }) unless value.nil?
         end
-
-        logger.debug "$$$$ SOBJECTS $$$$"
-        logger.debug sobjects
       end
     end
   end
