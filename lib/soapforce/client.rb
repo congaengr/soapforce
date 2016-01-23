@@ -583,7 +583,8 @@ module Soapforce
       metadata = describe(sobject_type)
 
       # Get only the keys that contain relationships described with dot-syntax
-      sobjects.first.keys.select { |key| key =~ /\./ }.each do |key|
+      keys = sobjects.map(&:keys).flatten.uniq.select { |key| key =~ /\./ }
+      keys.each do |key|
 
         rel_name, target_field = key.split('.')
 
@@ -593,11 +594,13 @@ module Soapforce
 
         referenced_sobject = field_metadata[:reference_to]
 
-        sobjects.map! do |obj|
+        sobjects.each do |obj|
           value = obj.delete(key)
-          {rel_name => {:"@xsi:type" => referenced_sobject, target_field => value }}.merge(obj) unless value.nil?
+          obj.update(rel_name => {:"@xsi:type" => referenced_sobject, target_field => value }) unless value.nil?
         end
 
+        logger.debug "$$$$ SOBJECTS $$$$"
+        logger.debug sobjects
       end
     end
   end
