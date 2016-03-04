@@ -1,3 +1,9 @@
+## 0.5.0 (Mar 4, 2016)
+
+* Default ssl_version to TLSv1_2
+* Switch to Ruby 2, updates rspec syntax, and update dependencies. #8
+* Add support for original message tag names #7
+
 ## 0.3.0 (Mar 25, 2015)
 
 * Adds merge command.
