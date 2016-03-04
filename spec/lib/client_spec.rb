@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Soapforce::Client do
   let(:endpoint) { 'https://na15.salesforce.com' }
+  let(:subject) { Soapforce::Client.new(tag_style: :snakecase) }
 
   describe "#operations" do
     it "should return list of operations from the wsdl" do
@@ -108,7 +109,8 @@ describe Soapforce::Client do
   describe "#retrieve" do
 
     it "should retrieve object by id" do
-      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
+      fields = fields_hash
+
       # retrieve calls describe to get the list of available fields.
       expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
@@ -128,8 +130,8 @@ describe Soapforce::Client do
 
   describe "#find" do
     it "should retrieve object by id" do
+      fields = fields_hash
 
-      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
       # retrieve calls describe to get the list of available fields.
       expect(subject).to receive(:describe).with("Opportunity").and_return(fields)
 
@@ -151,7 +153,8 @@ describe Soapforce::Client do
   describe "#find_by_field" do
 
     it "should retrieve object by string field" do
-      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
+      fields = fields_hash
+
       # retrieve calls describe to get the list of available fields.
       expect(subject).to receive(:describe).exactly(2).with("Opportunity").and_return(fields)
 
@@ -162,7 +165,12 @@ describe Soapforce::Client do
     end
 
     it "should retrieve object by number field" do
-      fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "Amount", :type => "double"}]}
+      if subject.tag_style == :raw
+        fields = {"fields" => [{"name" => "Id"},{"name" => "Name"},{"name" => "Description"},{"name" => "Amount", "type" => "double"}]}
+      else
+        fields = {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "Amount", :type => "double"}]}
+      end
+
       # retrieve calls describe to get the list of available fields.
       expect(subject).to receive(:describe).exactly(2).with("Opportunity").and_return(fields)
 
@@ -176,7 +184,7 @@ describe Soapforce::Client do
 
   describe "#find_where" do
 
-    let(:fields) { {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]} }
+    let(:fields) { fields_hash }
     let(:body) { "<tns:query><tns:queryString>SELECT Id, Name, Description, StageName FROM Opportunity WHERE Id = &#39;006A000000LbkT5IAJ&#39; AND Amount = 0.0</tns:queryString></tns:query>" }
 
     after(:each) do
@@ -387,6 +395,7 @@ describe Soapforce::Client do
       stub_api_request(endpoint, {with_body: @body, fixture: 'delete_response'})
       response = subject.delete!(@id)
 
+      expect(response).to be_an_instance_of Soapforce::Result
       expect(response[:success]).to eq true
       expect(response[:id]).to eq @id
     end
@@ -411,8 +420,10 @@ describe Soapforce::Client do
       stub_api_request(endpoint, {with_body: @body, fixture: 'merge_response'})
       response = subject.merge("Account", @object, @to_merge)
 
+      expect(response).to be_an_instance_of Soapforce::Result
       expect(response[:success]).to eq true
       expect(response[:id]).to eq @object[:id]
+      expect(response[:merged_record_ids]).to be_an(Array)
       expect(response[:merged_record_ids].sort).to eq @to_merge
     end
 
@@ -449,8 +460,10 @@ describe Soapforce::Client do
       stub_api_request(endpoint, {with_body: @body, fixture: 'process_submit_request_response'})
       response = subject.process({objectId: "a00i0000007JBLJAA4", comments: "Submitting for Approval"})
 
+      expect(response).to be_an_instance_of(Soapforce::Result)
       expect(response[:success]).to eq true
       expect(response[:new_workitem_ids]).to eq "04ii000000098uLAAQ"
+      expect(response["newWorkitemIds"]).to eq "04ii000000098uLAAQ"
     end
 
     it "process submit request with approvers" do
@@ -472,6 +485,14 @@ describe Soapforce::Client do
 
       expect(response[:success]).to eq true
       expect(response[:instance_status]).to eq "Removed"
+    end
+  end
+
+  def fields_hash
+    if subject.tag_style == :raw
+      {"fields" => [{"name" => "Id"},{"name" => "Name"},{"name" => "Description"},{"name" => "StageName"}]}
+    else
+      {:fields => [{:name => "Id"},{:name => "Name"},{:name => "Description"},{:name => "StageName"}]}
     end
   end
 
