@@ -27,8 +27,8 @@ module Soapforce
       @login_url = "https://#{@host}/services/Soap/u/#{@version}"
 
       @logger = options[:logger] || false
-      # Due to recent SSLv3 POODLE vulnerabilty we default to TLSv1
-      @ssl_version = options[:ssl_version] || :TLSv1
+      # Due to SSLv3 POODLE vulnerabilty and disabling of TLSv1, use TLSv1_2
+      @ssl_version = options[:ssl_version] || :TLSv1_2
 
       if options[:tag_style] == :raw
         @tag_style = :raw
