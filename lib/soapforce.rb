@@ -1,4 +1,5 @@
-require 'savon'
+require "forwardable"
+require "savon"
 
 require "soapforce/version"
 require "soapforce/configuration"
