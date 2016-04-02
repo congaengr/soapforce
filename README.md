@@ -125,7 +125,7 @@ client.upsert('Account', 'External__c', External__c: 12, Name: 'Foobar')
 
 ```ruby
 # Delete the Account with Id '006A000000Lbiiz'
-client.destroy('Account', '006A000000Lbiiz')
+client.destroy('006A000000Lbiiz')
 # => {id: '0016000000MRatd', success: => true}
 ```
 
