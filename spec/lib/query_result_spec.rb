@@ -60,6 +60,7 @@ describe Soapforce::QueryResult do
       }
 
       it { expect(subject.size).to eq 2 }
+      it { expect(subject.records).to be_an(Array) }
       it { expect(subject.query_locator).to be_nil }
       it { expect(subject).to be_done }
 
@@ -72,6 +73,17 @@ describe Soapforce::QueryResult do
         end
         expect(count).to be(2)
       end
+
+      it "#map" do
+        count = 0
+        subject.map do |obj|
+          count +=1
+          expect(obj[:id]).to eq count
+          expect(obj.Id).to eq count
+        end
+        expect(count).to be(2)
+      end
+
     end
 
   end

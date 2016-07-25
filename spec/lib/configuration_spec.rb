@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Soapforce do
+describe Soapforce::Configuration do
 
   after do
     Soapforce.instance_variable_set :@configuration, nil
