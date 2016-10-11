@@ -86,6 +86,24 @@ describe Soapforce::QueryResult do
 
     end
 
+    context "not done" do
+
+      subject {
+        hash = {
+          done: false,
+          query_locator: nil,
+          size: 1,
+          records: {id: 1, name: "Opportunity 1", stage_name: "Prospecting"}
+        }
+        Soapforce::QueryResult.new(hash)
+      }
+
+      it "#done?" do
+        expect(subject.done?).to eq false
+      end
+
+    end
+
   end
 
 end

@@ -46,7 +46,7 @@ module Soapforce
     end
 
     def done?
-      @raw_result[key_name("done")] || true
+      @raw_result[key_name("done")].nil? ? true : @raw_result[key_name("done")]
     end
 
     def query_locator
