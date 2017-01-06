@@ -24,7 +24,7 @@ module Soapforce
 
       @version = options[:version] || Soapforce.configuration.version || 28.0
       @host = options[:host] || "login.salesforce.com"
-      @login_url = "https://#{@host}/services/Soap/u/#{@version}"
+      @login_url = options[:login_url] || "https://#{@host}/services/Soap/u/#{@version}"
 
       @logger = options[:logger] || false
       # Due to SSLv3 POODLE vulnerabilty and disabling of TLSv1, use TLSv1_2
