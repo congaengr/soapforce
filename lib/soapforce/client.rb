@@ -1,6 +1,5 @@
 module Soapforce
   class Client
-
     attr_reader :client
     attr_reader :headers
     attr_reader :tag_style
@@ -8,22 +7,22 @@ module Soapforce
 
     # The partner.wsdl is used by default but can be changed by passing in a new :wsdl option.
     # A client_id can be
-    def initialize(options={})
+    def initialize(options = {})
       @describe_cache = {}
       @describe_layout_cache = {}
       @headers = {}
 
-      @wsdl = options[:wsdl] || File.dirname(__FILE__) + "/../../resources/partner.wsdl.xml"
+      @wsdl = options[:wsdl] || File.dirname(__FILE__) + '/../../resources/partner.wsdl.xml'
 
       # If a client_id is provided then it needs to be included
       # in the header for every request.  This allows ISV Partners
       # to make SOAP calls in Professional/Group Edition organizations.
 
       client_id = options[:client_id] || Soapforce.configuration.client_id
-      @headers = {"tns:CallOptions" => {"tns:client" => client_id}} if client_id
+      @headers = { 'tns:CallOptions' => { 'tns:client' => client_id } } if client_id
 
       @version = options[:version] || Soapforce.configuration.version || 28.0
-      @host = options[:host] || "login.salesforce.com"
+      @host = options[:host] || 'login.salesforce.com'
       @login_url = options[:login_url] || "https://#{@host}/services/Soap/u/#{@version}"
 
       @logger = options[:logger] || false
@@ -38,7 +37,14 @@ module Soapforce
         @response_tags = lambda { |key| key.snakecase.to_sym }
       end
 
-      @client = Savon.client(
+      # Override optional Savon attributes
+      savon_options = {}
+      %w(read_timeout open_timeout proxy raise_errors).each do |prop|
+        key = prop.to_sym
+        savon_options[key] = options[key] if options.key?(key)
+      end
+
+      @client = Savon.client({
         wsdl: @wsdl,
         soap_header: @headers,
         convert_request_keys_to: :none,
@@ -48,7 +54,7 @@ module Soapforce
         log: (@logger != false),
         endpoint: @login_url,
         ssl_version: @ssl_version # Sets ssl_version for HTTPI adapter
-        )
+      }.update(savon_options))
     end
 
     # Public: Get the names of all wsdl operations.
