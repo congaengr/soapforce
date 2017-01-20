@@ -118,7 +118,15 @@ client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
 ```ruby
 # Update the record with external ID of 12
 client.upsert('Account', 'External__c', External__c: 12, Name: 'Foobar')
-# => {id: '006A000000Lbiiz', success: => true, created: false}
+# => {id: '006A000000Lbiiz', success: true, created: false}
+```
+
+You may also set up Lookup or Master-Detail relationships by specifying the external ID of the related object like this -
+
+```ruby
+# Update the record with external ID of 12 and relate it to another object with external ID of 13
+client.upsert('Account', 'External__c', External__c: 12, Name: 'Foobar', 'Foo_Relation__r.External__c' => 13)
+# => {id: '006A000000Lbiiz', success: true, created: false}
 ```
 
 ### destroy
