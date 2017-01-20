@@ -1,3 +1,8 @@
+## 0.6.0 (Jan 19, 2017)
+* Require Forwardable #13
+* Fix QueryResult#done? #16
+* Adds login_url option #6
+
 ## 0.5.0 (Mar 4, 2016)
 
 * Default ssl_version to TLSv1_2
