@@ -15,7 +15,7 @@ Add this line to your application's Gemfile:
 
 Or to get the latest changes from the source:
 
-    gem 'soapforce', :git => "git://github.com/TinderBox/soapforce.git"
+    gem 'soapforce', git: "git://github.com/TinderBox/soapforce.git"
 
 And then execute:
 
@@ -42,7 +42,7 @@ For ISV Partners you can specify your client_id in a configuration block which w
 You can connect to sandbox orgs by specifying a host. The default host is 'login.salesforce.com':
 
 ```ruby
-client = Soapforce::Client.new(:host => 'test.salesforce.com')
+client = Soapforce::Client.new(host: 'test.salesforce.com')
 ```
 
 ### Logging
@@ -50,7 +50,7 @@ client = Soapforce::Client.new(:host => 'test.salesforce.com')
 You can specify a logger by passing a logger. Logging is disabled by default.
 
 ```ruby
-client = Soapforce::Client.new(:logger => Logger.new(STDOUT))
+client = Soapforce::Client.new(logger: Logger.new(STDOUT))
 ```
 
 #### Username/Password authentication
@@ -59,14 +59,14 @@ If you prefer to use a username and password to authenticate:
 
 ```ruby
 client = Soapforce::Client.new
-client.authenticate(:username => 'foo', :password => 'password_and_security_token')
+client.authenticate(username: 'foo', password: 'password_and_security_token')
 ```
 
 #### Session authentication
 
 ```ruby
 client = Soapforce::Client.new
-client.authenticate(:session_id => 'session id', :server_url  => 'server url')
+client.authenticate(session_id: 'session id', server_url: 'server url')
 ```
 
 ### find
@@ -102,7 +102,7 @@ client.search('FIND {bar}')
 ```ruby
 # Add a new account
 client.create('Account', Name: 'Foobar Inc.')
-# => {id: '006A000000Lbiiz', success: => true}
+# => {id: '006A000000Lbiiz', success: true}
 ```
 
 ### update
@@ -110,7 +110,7 @@ client.create('Account', Name: 'Foobar Inc.')
 ```ruby
 # Update the Account with Id '006A000000Lbiiz'
 client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
-# => {id: '006A000000Lbiiz', success: => true}
+# => {id: '006A000000Lbiiz', success: true}
 ```
 
 ### upsert
@@ -118,7 +118,7 @@ client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
 ```ruby
 # Update the record with external ID of 12
 client.upsert('Account', 'External__c', External__c: 12, Name: 'Foobar')
-# => {id: '006A000000Lbiiz', success: => true, created: false}
+# => {id: '006A000000Lbiiz', success: true, created: false}
 ```
 
 ### destroy
@@ -126,7 +126,27 @@ client.upsert('Account', 'External__c', External__c: 12, Name: 'Foobar')
 ```ruby
 # Delete the Account with Id '006A000000Lbiiz'
 client.destroy('006A000000Lbiiz')
-# => {id: '0016000000MRatd', success: => true}
+# => {id: '0016000000MRatd', success: true}
+```
+
+### convert lead
+
+```ruby
+# Convert single Lead to an Opportunity
+client.convert_lead(leadId: '00Qi000001bMOu0', opportunityName: 'Opportunity from Lead', convertedStatus: 'Closed - Converted')
+# => {account_id: '001i0000025uoFQAAY', contact_id: '003i000004Oow8eAAB', lead_id: '00Qi000001bMOu0EAG', opportunity_id: '006i000000hzfzaAAA', success: true}
+```
+
+```ruby
+# Convert multiples Leads to Opportunities
+client.convert_lead([
+  {leadId: '00Qi000001bMOuy', convertedStatus: 'Closed - Converted'},
+  {leadId: '00Qi000001bMOuo', convertedStatus: 'Closed - Converted'}
+])
+# => [
+#  {account_id: '001i0000025uoJHAAY', contact_id: '003i000004Op3ZeAAJ', lead_id: '00Qi000001bMOuyEAG', opportunity_id: '006i000000hzg0EAAQ', success: true},
+#  {account_id: '001i0000025uoJIAAY', contact_id: '003i000004Op3ZfAAJ', lead_id: '00Qi000001bMOuoEAG', opportunity_id: '006i000000hzg0FAAQ', success: true}
+# ]
 ```
 
 ### describe

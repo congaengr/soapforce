@@ -6,7 +6,7 @@ module Soapforce
 
     def_delegators :@raw_hash, :key?, :has_key?, :each, :map, :to_hash
 
-    def initialize(result_hash={})
+    def initialize(result_hash = {})
       @raw_hash = result_hash
     end
 
@@ -16,7 +16,7 @@ module Soapforce
         if @raw_hash.key?(index)
           @raw_hash[index]
         elsif index.to_s.include?('_')
-          camel_key = index.to_s.gsub(/\_(\w{1})/) {|cap| cap[1].upcase }
+          camel_key = index.to_s.gsub(/\_(\w{1})/) { |cap| cap[1].upcase }
           @raw_hash[camel_key]
         else
           @raw_hash[index.to_s]

@@ -291,7 +291,6 @@ module Soapforce
       call_soap_api(:update, sobjects_hash(sobject_type, properties))
     end
 
-
     # Public: Update or create a record based on an external ID
     #
     # sobject - The name of the sobject to created.
@@ -346,6 +345,22 @@ module Soapforce
       call_soap_api(:delete, {:ids => ids})
     end
     alias_method :destroy!, :delete
+
+    # Public: Convert Lead to Opportunity
+    #
+    # attrs   - Hash of attributes to set on the record.
+    #
+    # Example
+    #
+    #   client.convert_lead(leadId: '00Qi000001bMOtM',
+    #     opportunityName: 'Opportunity from Lead',
+    #     convertedStatus: 'Closed - Converted')
+    #
+    # Returns Soapforce::Result
+    def convert_lead(attributes)
+      leads = attributes.is_a?(Array) ? attributes : [attributes]
+      call_soap_api(:convert_lead, leadConverts: leads)
+    end
 
     # Public: Merges records together
     #
@@ -534,12 +549,12 @@ module Soapforce
     end
 
     # Supports the following No Argument methods:
-    #   get_user_info
     #   describe_global
     #   describe_softphone_layout
     #   describe_tabs
-    #   logout
     #   get_server_timestamp
+    #   get_user_info
+    #   logout
     def method_missing(method, *args)
       call_soap_api(method, *args)
     end
