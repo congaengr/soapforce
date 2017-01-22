@@ -1,4 +1,4 @@
-## 0.7.0 (Jan XX, 2017)
+## 0.7.0 (Jan 21, 2017)
 * Support Savon timeout and proxy options #19
 * Updated Partner WSDL #20
 * Adds convert_lead support #21
