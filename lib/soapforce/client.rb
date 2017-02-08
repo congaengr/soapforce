@@ -300,11 +300,30 @@ module Soapforce
     # Examples
     #
     #   # Update the record with external ID of 12
-    #   client.upsert!('Account', 'External__c', External__c: 12, Name: 'Foobar')
+    #   client.upsert('Account', 'External__c', External__c: 12, Name: 'Foobar')
     #
     # Returns Hash if the record was found and updated or newly created.
     # Raises an exception if an error is returned from Salesforce.
     def upsert(sobject_type, external_id_field_name, objects)
+      upsert!(sobject_type, external_id_field_name, objects)
+    rescue
+      false
+    end
+
+    # Public: Update or create a record based on an external ID
+    #
+    # sobject - The name of the sobject to created.
+    # field   - The name of the external Id field to match against.
+    # attrs   - Hash of attributes for the record.
+    #
+    # Examples
+    #
+    #   # Update the record with external ID of 12
+    #   client.upsert!('Account', 'External__c', External__c: 12, Name: 'Foobar')
+    #
+    # Returns Hash if the record was found and updated or newly created.
+    # Raises an exception if an error is returned from Salesforce.
+    def upsert!(sobject_type, external_id_field_name, objects)
       message = {externalIDFieldName: external_id_field_name}.merge(sobjects_hash(sobject_type, objects))
       call_soap_api(:upsert, message)
     end
