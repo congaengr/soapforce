@@ -21,6 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "savon", ">= 2.3.0", '< 3.0.0'
 
   spec.add_development_dependency 'rspec', '>= 2.14.0', '< 4.0.0'
-  spec.add_development_dependency 'webmock', '>= 1.17.0', '< 2.0.0'
+  spec.add_development_dependency 'webmock', '>= 1.17.0', '< 3.0.0'
   spec.add_development_dependency 'simplecov', '>= 0.9.0', '< 1.0.0'
 end
