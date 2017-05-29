@@ -10,7 +10,7 @@ module Soapforce
     def initialize(options = {})
       @describe_cache = {}
       @describe_layout_cache = {}
-      @headers = {}
+			@headers = {}
 
       @wsdl = options[:wsdl] || File.dirname(__FILE__) + '/../../resources/partner.wsdl.xml'
 
@@ -19,6 +19,9 @@ module Soapforce
       # to make SOAP calls in Professional/Group Edition organizations.
 
       client_id = options[:client_id] || Soapforce.configuration.client_id
+			
+			@headers = options[:headers] if options[:headers]
+				
       @headers = { 'tns:CallOptions' => { 'tns:client' => client_id } } if client_id
 
       @version = options[:version] || Soapforce.configuration.version || 28.0
@@ -204,21 +207,21 @@ module Soapforce
       response
     end
 
-    def query(soql)
-      call_soap_api(:query, {:queryString => soql})
+    def query(soql, header={})
+      call_soap_api(:query, {:queryString => soql}, header)
     end
 
     # Includes deleted (isDeleted) or archived (isArchived) records
-    def query_all(soql)
-      call_soap_api(:query_all, {:queryString => soql})
+    def query_all(soql, header={})
+      call_soap_api(:query_all, {:queryString => soql}, header)
     end
 
-    def query_more(locator)
-      call_soap_api(:query_more, {:queryLocator => locator})
+    def query_more(locator, header={})
+      call_soap_api(:query_more, {:queryLocator => locator}, header)
     end
 
-    def search(sosl)
-      call_soap_api(:search, {:searchString => sosl})
+    def search(sosl, header={})
+      call_soap_api(:search, {:searchString => sosl}, header)
     end
 
     # Public: Insert a new record.
@@ -234,8 +237,8 @@ module Soapforce
     #
     # Returns the String Id of the newly created sobject.
     # Returns false if something bad happens.
-    def create(sobject_type, properties)
-      create!(sobject_type, properties)
+    def create(sobject_type, properties, header={})
+      create!(sobject_type, properties, header)
     rescue
       false
     end
@@ -253,8 +256,8 @@ module Soapforce
     #
     # Returns the String Id of the newly created sobject.
     # Raises exceptions if an error is returned from Salesforce.
-    def create!(sobject_type, properties)
-      call_soap_api(:create, sobjects_hash(sobject_type, properties))
+    def create!(sobject_type, properties, header={})
+      call_soap_api(:create, sobjects_hash(sobject_type, properties), header)
     end
 
     # Public: Update a record.
@@ -269,8 +272,8 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully updated.
     # Returns false if there was an error.
-    def update(sobject_type, properties)
-      update!(sobject_type, properties)
+    def update(sobject_type, properties, header={})
+      update!(sobject_type, properties, header)
     rescue
       false
     end
@@ -287,8 +290,8 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully updated.
     # Raises an exception if an error is returned from Salesforce
-    def update!(sobject_type, properties)
-      call_soap_api(:update, sobjects_hash(sobject_type, properties))
+    def update!(sobject_type, properties, header={})
+      call_soap_api(:update, sobjects_hash(sobject_type, properties), header)
     end
 
     # Public: Update or create a record based on an external ID
@@ -304,8 +307,8 @@ module Soapforce
     #
     # Returns Hash if the record was found and updated or newly created.
     # Raises an exception if an error is returned from Salesforce.
-    def upsert(sobject_type, external_id_field_name, objects)
-      upsert!(sobject_type, external_id_field_name, objects)
+    def upsert(sobject_type, external_id_field_name, objects, header={})
+      upsert!(sobject_type, external_id_field_name, objects, header)
     rescue
       false
     end
@@ -323,9 +326,9 @@ module Soapforce
     #
     # Returns Hash if the record was found and updated or newly created.
     # Raises an exception if an error is returned from Salesforce.
-    def upsert!(sobject_type, external_id_field_name, objects)
+    def upsert!(sobject_type, external_id_field_name, objects, header={})
       message = {externalIDFieldName: external_id_field_name}.merge(sobjects_hash(sobject_type, objects))
-      call_soap_api(:upsert, message)
+      call_soap_api(:upsert, message, header)
     end
 
     # Public: Delete a record.
@@ -340,8 +343,8 @@ module Soapforce
     #
     # Returns true if the sobject was successfully deleted.
     # Returns false if an error is returned from Salesforce.
-    def delete(id)
-      delete!(id)
+    def delete(id, header = {})
+      delete!(id, header)
     rescue
       false
     end
@@ -359,9 +362,9 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully deleted.
     # Raises an exception if an error is returned from Salesforce.
-    def delete!(id)
+    def delete!(id, header={})
       ids = id.is_a?(Array) ? id : [id]
-      call_soap_api(:delete, {:ids => ids})
+      call_soap_api(:delete, {:ids => ids}, header)
     end
     alias_method :destroy!, :delete
 
@@ -376,9 +379,9 @@ module Soapforce
     #     convertedStatus: 'Closed - Converted')
     #
     # Returns Soapforce::Result
-    def convert_lead(attributes)
+    def convert_lead(attributes, header={})
       leads = attributes.is_a?(Array) ? attributes : [attributes]
-      call_soap_api(:convert_lead, leadConverts: leads)
+      call_soap_api(:convert_lead, {leadConverts: leads}, header)
     end
 
     # Public: Merges records together
@@ -402,7 +405,6 @@ module Soapforce
         }
       )
     end
-
     # Public: Merges records together
     #
     # sobject       - String name of the sobject
@@ -590,10 +592,20 @@ module Soapforce
       end
     end
 
-    def call_soap_api(method, message_hash={})
-
+		def header_hash(header)
+			xml_header = header.map do |k,v|
+				header_fields = v.map {|k,v| ["tns:#{k}",v]}.to_h
+				header_name = "tns:#{k}"
+				[header_name, header_fields]
+			end
+			xml_header.to_h
+		end
+				 
+    def call_soap_api(method, message_hash={}, header={})
+			
       response = @client.call(method.to_sym) do |locals|
         locals.message message_hash
+				locals.soap_header header_hash(header) unless header.empty?
       end
 
       # Convert SOAP XML to Hash
