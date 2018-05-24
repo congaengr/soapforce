@@ -1,30 +1,19 @@
 # Soapforce
 
-
-[![Build Status](https://travis-ci.org/TinderBox/soapforce.png)](https://travis-ci.org/TinderBox/soapforce)
-
+_**PLEASE NOTE:** README.md modified to match changes in this Forked repo, if a PR is made to original Tinderbox repo some changes will need to be reverted to match that repo_
 
 Soapforce is a ruby gem for the [Salesforce SOAP API](http://www.salesforce.com/us/developer/docs/api/index.htm).
 This gem was modeled after the [restforce](https://github.com/ejholmes/restforce) gem and depends on [Savon 2](http://savonrb.com/version2/).
 
 ## Installation
 
-Add this line to your application's Gemfile:
+Add this line to your application's Gemfile (getting the latest changes from the source):
 
-    gem 'soapforce'
-
-Or to get the latest changes from the source:
-
-    gem 'soapforce', git: "git://github.com/TinderBox/soapforce.git"
+    gem 'soapforce', git: "git://github.com/skplunkerin/soapforce-v41.git", branch: "master"
 
 And then execute:
 
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install soapforce
-
+    $ bundle install
 
 ## Usage
 
