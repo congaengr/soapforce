@@ -19,6 +19,7 @@ module Soapforce
       # to make SOAP calls in Professional/Group Edition organizations.
 
       client_id = options[:client_id] || Soapforce.configuration.client_id
+      @headers = options[:headers] if options[:headers]
       @headers = { 'tns:CallOptions' => { 'tns:client' => client_id } } if client_id
 
       @version = options[:version] || Soapforce.configuration.version || 28.0
@@ -269,8 +270,8 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully updated.
     # Returns false if there was an error.
-    def update(sobject_type, properties)
-      update!(sobject_type, properties)
+    def update(sobject_type, properties, header={})
+      update!(sobject_type, properties, header)
     rescue
       false
     end
@@ -287,8 +288,8 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully updated.
     # Raises an exception if an error is returned from Salesforce
-    def update!(sobject_type, properties)
-      call_soap_api(:update, sobjects_hash(sobject_type, properties))
+    def update!(sobject_type, properties, header={})
+      call_soap_api(:update, sobjects_hash(sobject_type, properties), header)
     end
 
     # Public: Update or create a record based on an external ID
@@ -590,10 +591,10 @@ module Soapforce
       end
     end
 
-    def call_soap_api(method, message_hash={})
-
+    def call_soap_api(method, message_hash={}, header={})
       response = @client.call(method.to_sym) do |locals|
         locals.message message_hash
+        locals.soap_header headers_hash(header) unless header.empty?
       end
 
       # Convert SOAP XML to Hash
@@ -623,6 +624,15 @@ module Soapforce
       end
 
       result
+    end
+
+    def headers_hash(headers)
+      header = headers.map do |k,v|
+        name = "tns:#{k}"
+        fields = v.map {|k,v| ["tns:#{k}",v]}.to_h
+        [name, fields]
+      end
+      header.to_h
     end
 
     def sobjects_hash(sobject_type, sobject_hash)

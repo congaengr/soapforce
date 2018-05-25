@@ -102,6 +102,12 @@ client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
 # => {id: '006A000000Lbiiz', success: true}
 ```
 
+```ruby
+# Update the Account with Id '006A000000Lbiiz' using <AllOrNoneHeader>
+client.update('Account', {Id: '006A000000Lbiiz', Name: 'Whizbang Corp'}, {AllOrNoneHeader: {allOrNone: 'true'}})
+# => {id: '006A000000Lbiiz', success: true}
+```
+
 ### upsert
 
 ```ruby
