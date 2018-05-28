@@ -3,7 +3,8 @@ module Soapforce
     attr_reader :client
     attr_reader :headers
     attr_reader :tag_style
-    attr_accessor :logger
+    attr_reader :message_hash
+    attr_accessor :logger, :request_headers
 
     # The partner.wsdl is used by default but can be changed by passing in a new :wsdl option.
     # A client_id can be
@@ -11,6 +12,8 @@ module Soapforce
       @describe_cache = {}
       @describe_layout_cache = {}
       @headers = {}
+      @message_hash = {}
+      @request_headers = {}
 
       @wsdl = options[:wsdl] || File.dirname(__FILE__) + '/../../resources/partner.wsdl.xml'
 
@@ -255,7 +258,8 @@ module Soapforce
     # Returns the String Id of the newly created sobject.
     # Raises exceptions if an error is returned from Salesforce.
     def create!(sobject_type, properties)
-      call_soap_api(:create, sobjects_hash(sobject_type, properties))
+      sobjects_hash(sobject_type, properties)
+      call_soap_api(:create)
     end
 
     # Public: Update a record.
@@ -270,8 +274,8 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully updated.
     # Returns false if there was an error.
-    def update(sobject_type, properties, header={})
-      update!(sobject_type, properties, header)
+    def update(sobject_type, properties)
+      update!(sobject_type, properties)
     rescue
       false
     end
@@ -288,8 +292,9 @@ module Soapforce
     #
     # Returns Hash if the sobject was successfully updated.
     # Raises an exception if an error is returned from Salesforce
-    def update!(sobject_type, properties, header={})
-      call_soap_api(:update, sobjects_hash(sobject_type, properties), header)
+    def update!(sobject_type, properties)
+      sobjects_hash(sobject_type, properties)
+      call_soap_api(:update)
     end
 
     # Public: Update or create a record based on an external ID
@@ -591,10 +596,12 @@ module Soapforce
       end
     end
 
-    def call_soap_api(method, message_hash={}, header={})
+    def call_soap_api(method, message={})
+      @message_hash = message unless message.empty?
+
       response = @client.call(method.to_sym) do |locals|
-        locals.message message_hash
-        locals.soap_header headers_hash(header) unless header.empty?
+        locals.message @message_hash
+        locals.soap_header headers_hash(@request_headers) unless @request_headers.empty?
       end
 
       # Convert SOAP XML to Hash
@@ -644,10 +651,10 @@ module Soapforce
       end
 
       sobjects.map! do |obj|
-        {"ins0:type" => sobject_type}.merge(obj)
+        # {"ins0:type" => sobject_type}.merge(obj)
+        {"@xsi:type" => sobject_type}.merge(obj)
       end
-
-      {sObjects: sobjects}
+      @message_hash = {sObjects: sobjects}
     end
   end
 end
