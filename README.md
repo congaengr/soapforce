@@ -1,19 +1,30 @@
 # Soapforce
 
-_**PLEASE NOTE:** README.md modified to match changes in this Forked repo, if a PR is made to original Tinderbox repo some changes will need to be reverted to match that repo_
+
+[![Build Status](https://travis-ci.org/TinderBox/soapforce.png)](https://travis-ci.org/TinderBox/soapforce)
+
 
 Soapforce is a ruby gem for the [Salesforce SOAP API](http://www.salesforce.com/us/developer/docs/api/index.htm).
 This gem was modeled after the [restforce](https://github.com/ejholmes/restforce) gem and depends on [Savon 2](http://savonrb.com/version2/).
 
 ## Installation
 
-Add this line to your application's Gemfile (getting the latest changes from the source):
+Add this line to your application's Gemfile:
 
-    gem 'soapforce', git: "git://github.com/skplunkerin/soapforce-v41.git", branch: "master"
+    gem 'soapforce'
+
+Or to get the latest changes from the source:
+
+    gem 'soapforce', git: "git://github.com/TinderBox/soapforce.git"
 
 And then execute:
 
-    $ bundle install
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install soapforce
+
 
 ## Usage
 
@@ -49,6 +60,14 @@ If you prefer to use a username and password to authenticate:
 ```ruby
 client = Soapforce::Client.new
 client.authenticate(username: 'foo', password: 'password_and_security_token')
+```
+
+#### Add headers to your request
+
+```
+# For any request you make, you can add your headers before hand like so:
+client.request_headers = { AllOrNoneHeader: { allOrNone: 'true' } }
+client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
 ```
 
 #### Session authentication
@@ -104,7 +123,8 @@ client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
 
 ```ruby
 # Update the Account with Id '006A000000Lbiiz' using <AllOrNoneHeader>
-client.update('Account', {Id: '006A000000Lbiiz', Name: 'Whizbang Corp'}, {AllOrNoneHeader: {allOrNone: 'true'}})
+client.request_headers = { AllOrNoneHeader: { allOrNone: 'true' } }
+client.update('Account', {Id: '006A000000Lbiiz', Name: 'Whizbang Corp'})
 # => {id: '006A000000Lbiiz', success: true}
 ```
 
