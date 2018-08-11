@@ -39,7 +39,7 @@ module Soapforce
 
       # Override optional Savon attributes
       savon_options = {}
-      %w(read_timeout open_timeout proxy raise_errors).each do |prop|
+      %w(read_timeout open_timeout proxy raise_errors filters).each do |prop|
         key = prop.to_sym
         savon_options[key] = options[key] if options.key?(key)
       end
