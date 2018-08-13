@@ -18,7 +18,7 @@ describe Soapforce::Client do
       stub = stub_login_request({with_body: body})
       stub.to_return(:status => 200, :body => fixture("login_response")) #, :headers => {})
 
-      subject.login(username: 'testing', password: 'password_and_token')
+      subject.login(username: 'testing', password: 'password_and_token', filters: [])
     end
 
     it "authenticates with session_id and instance_url" do
@@ -319,7 +319,7 @@ describe Soapforce::Client do
 
   describe "#update" do
     before(:each) do
-      @body = "<tns:update><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:update>"
+      @body = "<tns:update><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Id>003ABCDE</tns:Id><tns:Name>SOAPForce Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:update>"
       @params = { Id: '003ABCDE', Name: "SOAPForce Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
     end
 
@@ -356,7 +356,7 @@ describe Soapforce::Client do
 
   describe "#upsert" do
     before(:each) do
-      @body = "<tns:upsert><tns:externalIDFieldName>External_Id__c</tns:externalIDFieldName><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>New Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects><tns:sObjects><ins0:type>Opportunity</ins0:type><ins0:Id>003ABCDE</ins0:Id><tns:Name>Existing Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:upsert>"
+      @body = "<tns:upsert><tns:externalIDFieldName>External_Id__c</tns:externalIDFieldName><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Name>New Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Prospecting</tns:StageName></tns:sObjects><tns:sObjects><ins0:type>Opportunity</ins0:type><tns:Id>003ABCDE</tns:Id><tns:Name>Existing Opportunity</tns:Name><tns:CloseDate>2013-08-12</tns:CloseDate><tns:StageName>Closed Won</tns:StageName></tns:sObjects></tns:upsert>"
       @objects = [
         { Name: "New Opportunity", CloseDate: '2013-08-12', StageName: 'Prospecting' },
         { Id: '003ABCDE', Name: "Existing Opportunity", CloseDate: '2013-08-12', StageName: 'Closed Won' }
