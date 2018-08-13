@@ -30,7 +30,7 @@ module Soapforce
       @ssl_version = options[:ssl_version] || :TLSv1_2
 
       # For security purposes, default to filtering out passwords
-      # To override this, the options hash can include: filters => [] 
+      # To override this, include the following in the opportunities hash: filters => [] 
       @filters = options[:filters] || [:password]
 
       if options[:tag_style] == :raw
