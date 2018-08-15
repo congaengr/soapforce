@@ -18,7 +18,7 @@ describe Soapforce::Client do
       stub = stub_login_request({with_body: body})
       stub.to_return(:status => 200, :body => fixture("login_response")) #, :headers => {})
 
-      subject.login(username: 'testing', password: 'password_and_token', filters: [])
+      subject.login(username: 'testing', password: 'password_and_token')
     end
 
     it "authenticates with session_id and instance_url" do
