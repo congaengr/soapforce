@@ -1,3 +1,7 @@
+## 0.8.0 (Aug 27, 2018)
+* Add Log Filter Options for Savon #33
+* Modified upsert method #22
+
 ## 0.7.0 (Jan 21, 2017)
 * Support Savon timeout and proxy options #19
 * Updated Partner WSDL #20
