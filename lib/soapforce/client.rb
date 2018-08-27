@@ -29,6 +29,10 @@ module Soapforce
       # Due to SSLv3 POODLE vulnerabilty and disabling of TLSv1, use TLSv1_2
       @ssl_version = options[:ssl_version] || :TLSv1_2
 
+      # For security purposes, default to filtering out passwords
+      # To override this, include the following in the opportunities hash: filters => [] 
+      @filters = options[:filters] || [:password]
+
       if options[:tag_style] == :raw
         @tag_style = :raw
         @response_tags = lambda { |key| key }
@@ -50,6 +54,7 @@ module Soapforce
         convert_request_keys_to: :none,
         convert_response_tags_to: @response_tags,
         pretty_print_xml: true,
+        filters: @filters,
         logger: @logger,
         log: (@logger != false),
         endpoint: @login_url,
@@ -102,6 +107,7 @@ module Soapforce
         convert_request_keys_to: :none,
         convert_response_tags_to: @response_tags,
         logger: @logger,
+        filters: @filters,
         log: (@logger != false),
         endpoint: @server_url,
         ssl_version: @ssl_version # Sets ssl_version for HTTPI adapter
