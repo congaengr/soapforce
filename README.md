@@ -62,6 +62,14 @@ client = Soapforce::Client.new
 client.authenticate(username: 'foo', password: 'password_and_security_token')
 ```
 
+#### Add headers to your request
+
+```
+# For any request you make, you can add your headers before hand like so:
+client.request_headers = { AllOrNoneHeader: { allOrNone: 'true' } }
+client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
+```
+
 #### Session authentication
 
 ```ruby
@@ -110,6 +118,13 @@ client.create('Account', Name: 'Foobar Inc.')
 ```ruby
 # Update the Account with Id '006A000000Lbiiz'
 client.update('Account', Id: '006A000000Lbiiz', Name: 'Whizbang Corp')
+# => {id: '006A000000Lbiiz', success: true}
+```
+
+```ruby
+# Update the Account with Id '006A000000Lbiiz' using <AllOrNoneHeader>
+client.request_headers = { AllOrNoneHeader: { allOrNone: 'true' } }
+client.update('Account', {Id: '006A000000Lbiiz', Name: 'Whizbang Corp'})
 # => {id: '006A000000Lbiiz', success: true}
 ```
 
