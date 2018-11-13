@@ -386,6 +386,16 @@ module Soapforce
       leads = attributes.is_a?(Array) ? attributes : [attributes]
       call_soap_api(:convert_lead, leadConverts: leads)
     end
+    
+    # convert_lead_requests - array of ConvertLeadRequest
+    # returns array of Soapforce::Result
+    def batch_convert_lead!(convert_lead_requests)
+      r = call_soap_api(
+        :convert_lead,
+        request: convert_lead_requests.map(&:request_hash)
+      )
+      [r].flatten
+    end
 
     # Public: Merges records together
     #
@@ -407,6 +417,16 @@ module Soapforce
           recordToMergeIds: ids
         }
       )
+    end
+    
+    # merge_requests - array of MergeRequest
+    # returns array of soapforce result
+    def batch_merge!(merge_requests)
+      r = call_soap_api(
+        :merge,
+        request: merge_requests.map(&:request_hash)
+      )
+      [r].flatten
     end
 
     # Public: Merges records together
